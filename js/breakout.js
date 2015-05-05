@@ -71,7 +71,7 @@
 		var oProjectile = {
 			"color": "#00CC66",
 			"size": 15,
-			"speed": 3,
+			"speed": 5,
 			"posX": oApplication.canvas.width / 2 - 15 / 2,
 			"posY": oApplication.canvas.height - 45,
 			"angle": -45,
@@ -101,7 +101,7 @@
 				if( this.posX + this.size >= oSourceCanvasRect.width ){
 					if( this.angle == 45 ){
 						this.angle = -45;
-					} else if( tis.angle == 135 ){
+					} else if( this.angle == 135 ){
 						this.angle = -135;
 					} 
 				}
@@ -110,7 +110,17 @@
 					fGameOver();
 				}
 
+				// Si on touche le bord haut de la plateforme
+				if( this.posY + this.size >= oPlatform.posY && this.posX > oPlatform.posX - this.size && this.posX + this.size <= oPlatform.posX + oPlatform.width ){
+					if( this.angle == 135 ){
+						this.angle = 45;
+					} else if( this.angle == -135 ){
+						this.angle = -45;
+					}
+				}
 
+
+				// Calculate trajectory based on direction angle (ranging from -180 to 180 degrees)
 				if ( this.angle >= 90){
 					newX = ( 180 - this.angle ) / 90 ;
 					newY = ( this.angle - 90 ) / 90;
@@ -125,9 +135,6 @@
 					newY = - ( 90 + this.angle ) / 90 ;
 				}
 
-
-				
-				//alert( "X: " + newX + " Y:" + newY );
 				this.posX += newX * this.speed;
 				this.posY += newY * this.speed;
 
