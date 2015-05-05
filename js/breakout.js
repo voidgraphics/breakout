@@ -98,15 +98,15 @@
 		oApplication.canvas.addEventListener( "click", start );
 
 
-		// Modifier l'écart entre les tubes
+		// TODO: Modifier la position de platform
 		window.addEventListener( "keypress", function( e ){
-			if( e.keyCode == 38 ){
-				// Up key
-				console.log( "up" );
+			if( e.keyCode == 37 ){
+				// Left key
+				console.log( "Left" );
 
-			} else if( e.keyCode == 40 ) {
-				// Down key
-				console.log( "down" );
+			} else if( e.keyCode == 39 ) {
+				// Right key
+				console.log( "Right" );
 			}
 		} );
 
