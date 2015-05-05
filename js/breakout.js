@@ -79,6 +79,7 @@
 				// TODO: movement
 				var newX, newY;
 
+				// Si on touche le bord gauche du canvas
 				if( this.posX <= 0 ){
 					if( this.angle == -45 ){
 						this.angle = 45;
@@ -86,6 +87,7 @@
 						this.angle = 135;
 					}
 				}
+				// Si on touche le bord haut du canvas
 				if( this.posY <= 0 ){
 					if( this.angle == 45 ){
 						this.angle = 135;
@@ -95,6 +97,7 @@
 						this.angle = 180;
 					}
 				}
+				// Si on touche le bord droit du canvas
 				if( this.posX + this.size >= oSourceCanvasRect.width ){
 					if( this.angle == 45 ){
 						this.angle = -45;
@@ -102,6 +105,7 @@
 						this.angle = -135;
 					} 
 				}
+				// Si on touche le bord bas du canvas
 				if( this.posY + this.size > oSourceCanvasRect.height ){
 					fGameOver();
 				}
