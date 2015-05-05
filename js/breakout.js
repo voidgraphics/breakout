@@ -71,10 +71,31 @@
 		var oProjectile = {
 			"color": "#00CC66",
 			"size": 15,
-			"speed": 20,
+			"speed": 3,
 			"posX": oApplication.canvas.width / 2 - 15 / 2,
 			"posY": oApplication.canvas.height - 45,
+			"angle": 45,
 			"update": function() {
+				// TODO: movement
+				var newX, newY;
+				if ( this.angle >= 90){
+					newX = ( 180 - this.angle ) / 90 ;
+					newY = ( this.angle - 90 ) / 90;
+				} else if ( this.angle < -90) {
+					newX = - ( 180 + this.angle ) / 90;
+					newY = - ( this.angle + 90 ) / 90 ;
+				} else if ( this.angle >= 0) {
+					newX = ( this.angle ) / 90;
+					newY = ( this.angle - 90 ) / 90 ;
+				} else if( this.angle < 0) {
+					newX = ( this.angle ) / 90;
+					newY = - ( 90 + this.angle ) / 90 ;
+				}
+				
+				//alert( "X: " + newX + " Y:" + newY );
+				this.posX += newX * this.speed;
+				this.posY += newY * this.speed;
+
 				this.render();
 			},
 			"render": function() {
@@ -82,7 +103,7 @@
 				ctx.fillStyle = this.color;
 				ctx.fillRect( this.posX, this.posY, this.size, this.size );
 			}
-		}
+		};
 
 
 		// start game
@@ -144,7 +165,7 @@
 			ctx.font = "500 12px 'Avenir Next'";
 			ctx.textAlign = "center";
 			ctx.fillText("Code by Adrien Leloup, 2284", oApplication.width / 2, oApplication.height / 1.2);
-		}
+		};
 
 		// Called at each animation frame request
 		var fAnimationLoop = function() {
