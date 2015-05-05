@@ -18,15 +18,19 @@
 		};
 
 		// Bricks
-		var Brick = function() {
-			var iWidth, iHeight;
-			iWidth = 25;
-			iHeight = 5;
+		var Brick = function( x, y ) {
+			var iWidth, iHeight, iX, iY;
+			this.iWidth = 30;
+			this.iHeight = 8;
+			this.iX = x;
+			this.iY = y;
 		};
 
 		Brick.prototype.render = function() {
 			oApplication.context.fillStyle = "crimson";
-
+			aBricks.forEach( function( element ) {
+				oApplication.context.fillRect( element.iX, element.iY, element.iWidth, element.iHeight );
+			} );
 		};
 
 		Brick.prototype.update = function() {
@@ -61,10 +65,30 @@
 		};
 
 		var fGenerateBricks = function() {
+			var iPaddingX = 150, 
+				iPaddingY = 30, 
+				iXOffset = iPaddingX, 
+				iYOffset = iPaddingY, 
+				topBrickCount = 8, 
+				lineNumber = 1, 
+				maxLines = 8, 
+				iXSpacing = 40;
 			console.log( "Generating bricks!" );
-			for( var i = 0; i < 50 ; i++ ){
-				aBricks.push( new Brick );
+			for( var i = 1; i <= topBrickCount ; i++ ){
+				aBricks.push( new Brick( iXOffset, iYOffset ) );
 				console.log( "Created a brick!" );
+
+				if( i == topBrickCount ){
+					iXOffset =  iPaddingX + lineNumber * ( ( aBricks[0].iWidth / 2 ) + ( iXSpacing - aBricks[0].iWidth ) / 2 );
+					iYOffset += 25;
+					lineNumber++;
+					topBrickCount--;
+					if( lineNumber <= maxLines ){
+						i = 0;
+					}
+				} else {
+					iXOffset += iXSpacing;
+				}
 			}
 		};
 
