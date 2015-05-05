@@ -56,6 +56,8 @@
 			// Draw platform
 			oPlatform.init();
 
+			fShowStartscreen();
+
 		};
 
 		var start = function() {
@@ -91,6 +93,14 @@
 				}
 			}
 		};
+
+		var fShowStartscreen = function() {
+			var ctx = oApplication.context;
+			ctx.fillStyle = "white";
+			ctx.font = "700 36px 'Avenir Next'";
+			ctx.textAlign = "center";
+			ctx.fillText("CLICK TO START", oApplication.width / 2, oApplication.height / 2);
+		}
 
 		// Called at each animation frame request
 		var fAnimationLoop = function() {
