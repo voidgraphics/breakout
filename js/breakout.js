@@ -6,7 +6,8 @@
 
 		// Global params
 		var iAnimationRequestId = 0,
-			aBricks = [];
+			aBricks = [],
+			oSourceCanvasRect = oApplication.canvas.getBoundingClientRect();
 
 		// Background
 		var oBackground = {
@@ -49,7 +50,6 @@
 			"init": function(){
 			},
 			"update": function( oEvent ){
-				var oSourceCanvasRect = oApplication.canvas.getBoundingClientRect();
 				if( oEvent.keyCode == 37 ){
 					// Left key
 					this.posX-=this.speed;
@@ -74,10 +74,39 @@
 			"speed": 3,
 			"posX": oApplication.canvas.width / 2 - 15 / 2,
 			"posY": oApplication.canvas.height - 45,
-			"angle": 45,
+			"angle": -45,
 			"update": function() {
 				// TODO: movement
 				var newX, newY;
+
+				if( this.posX <= 0 ){
+					if( this.angle == -45 ){
+						this.angle = 45;
+					} else if( this.angle == -135 ){
+						this.angle = 135;
+					}
+				}
+				if( this.posY <= 0 ){
+					if( this.angle == 45 ){
+						this.angle = 135;
+					} else if( this.angle == -45 ){
+						this.angle = -135;
+					} else if ( this.angle = 0 ) {
+						this.angle = 180;
+					}
+				}
+				if( this.posX + this.size >= oSourceCanvasRect.width ){
+					if( this.angle == 45 ){
+						this.angle = -45;
+					} else if( tis.angle == 135 ){
+						this.angle = -135;
+					} 
+				}
+				if( this.posY + this.size > oSourceCanvasRect.height ){
+					fGameOver();
+				}
+
+
 				if ( this.angle >= 90){
 					newX = ( 180 - this.angle ) / 90 ;
 					newY = ( this.angle - 90 ) / 90;
@@ -91,6 +120,8 @@
 					newX = ( this.angle ) / 90;
 					newY = - ( 90 + this.angle ) / 90 ;
 				}
+
+
 				
 				//alert( "X: " + newX + " Y:" + newY );
 				this.posX += newX * this.speed;
