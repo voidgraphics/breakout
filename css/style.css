@@ -1,0 +1,27 @@
+html{
+	font-family: 'Avenir Next', sans-serif;
+}
+
+body{
+	background: url('../img/bcg.png');
+}
+
+h1{
+	font-family: "Avenir Next";
+	letter-spacing: 4px;
+	margin: 50px 0;
+	color: white;
+	font-weight: 800;
+	text-align: center;
+	text-transform:uppercase;
+}
+
+canvas{
+	display: block;
+	margin: 20px auto;
+	border: 1px solid #ccc;
+}
+
+::selection{
+	background: transparent;
+}
