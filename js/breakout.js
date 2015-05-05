@@ -41,19 +41,22 @@
 			"width": 100,
 			"height": 10,
 			"color": "white",
+			"speed": 30,
 			"posX": oApplication.canvas.width / 2 - 50,
 			"posY": oApplication.canvas.height - 30,
 			"init": function(){
 			},
 			"update": function( oEvent ){
+				var oSourceCanvasRect = oApplication.canvas.getBoundingClientRect();
 				if( oEvent.keyCode == 37 ){
 					// Left key
-					console.log( "Left" );
-					this.posX-=10;
+					this.posX-=this.speed;
+					( this.posX < 0 ) && ( this.posX = 0 );
+					
 				} else if( oEvent.keyCode == 39 ) {
 					// Right key
-					console.log( "Right" );
-					this.posX+=10;
+					this.posX+=this.speed;
+					( this.posX > oSourceCanvasRect.width - this.width ) && ( this.posX = oSourceCanvasRect.width - this.width  );
 				}
 			},
 			"render": function(){
@@ -80,6 +83,8 @@
 
 		var start = function() {
 			console.log( "Starting game!" );
+			// Modifier la position de platform
+			window.addEventListener( "keypress", oPlatform.update.bind( oPlatform ) );
 			oApplication.canvas.removeEventListener( "click", start );
 			fAnimationLoop();
 		};
@@ -93,7 +98,7 @@
 				lineNumber = 1, 
 				maxLines = 8, 
 				iXSpacing = 40;
-			console.log( "Generating bricks!" );
+			console.log( "Generating bricks:" );
 			for( var i = 1; i <= topBrickCount ; i++ ){
 				aBricks.push( new Brick( iXOffset, iYOffset ) );
 				console.log( "Created a brick!" );
@@ -110,6 +115,7 @@
 					iXOffset += iXSpacing;
 				}
 			}
+			console.log("Done! Ready to start...");
 		};
 
 		var fShowStartscreen = function() {
@@ -149,8 +155,7 @@
 		oApplication.canvas.addEventListener( "click", start );
 
 
-		// TODO: Modifier la position de platform
-		window.addEventListener( "keypress", oPlatform.update.bind( oPlatform ) );
+		
 
 	};
 
