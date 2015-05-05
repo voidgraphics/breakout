@@ -47,8 +47,6 @@
 			"speed": 30,
 			"posX": oApplication.canvas.width / 2 - 50,
 			"posY": oApplication.canvas.height - 30,
-			"init": function(){
-			},
 			"update": function( oEvent ){
 				if( oEvent.keyCode == 37 ){
 					// Left key
@@ -76,10 +74,10 @@
 			"posY": oApplication.canvas.height - 45,
 			"angle": -45,
 			"update": function() {
-				// TODO: movement
+				// Movement
 				var newX, newY;
 
-				// Si on touche le bord gauche du canvas
+				// Hitting left side of canvas
 				if( this.posX <= 0 ){
 					if( this.angle == -45 ){
 						this.angle = 45;
@@ -87,7 +85,7 @@
 						this.angle = 135;
 					}
 				}
-				// Si on touche le bord haut du canvas
+				// Hitting top side of canvas
 				if( this.posY <= 0 ){
 					if( this.angle == 45 ){
 						this.angle = 135;
@@ -97,7 +95,7 @@
 						this.angle = 180;
 					}
 				}
-				// Si on touche le bord droit du canvas
+				// Hitting right side of canvas
 				if( this.posX + this.size >= oSourceCanvasRect.width ){
 					if( this.angle == 45 ){
 						this.angle = -45;
@@ -105,12 +103,12 @@
 						this.angle = -135;
 					} 
 				}
-				// Si on touche le bord bas du canvas
+				// Hitting bottom side of canvas
 				if( this.posY + this.size > oSourceCanvasRect.height ){
 					fGameOver();
 				}
 
-				// Si on touche le bord haut de la plateforme
+				// Hitting top side of platform
 				if( this.posY + this.size >= oPlatform.posY && this.posX > oPlatform.posX - this.size && this.posX + this.size <= oPlatform.posX + oPlatform.width ){
 					if( this.angle == 135 ){
 						this.angle = 45;
@@ -147,24 +145,22 @@
 			}
 		};
 
-
-		// start game
+		// prepare things before we start
 		var init = function() {
 			console.log( "Initialising game" );
 			// Draw background
 			oBackground.render();
 			// Generate bricks
 			fGenerateBricks();
-			// Draw platform
-			oPlatform.init();
-
+			// Show start screen
 			fShowStartscreen();
 
 		};
 
+		// start game
 		var start = function() {
 			console.log( "Starting game!" );
-			// Modifier la position de platform
+			// listen to arrow keys to trigger platform movement
 			window.addEventListener( "keypress", oPlatform.update.bind( oPlatform ) );
 			oApplication.canvas.removeEventListener( "click", start );
 			fAnimationLoop();
@@ -220,7 +216,7 @@
 			for( var i=0; i < aBricks.length; i+=2 ){
 				aBricks[ i ].update();
 			}
-			// update platform
+			// render platform
 			oPlatform.render();
 			// update projectile
 			oProjectile.update();
@@ -230,17 +226,12 @@
 		var fGameOver = function() {
 			window.cancelAnimationFrame( iAnimationRequestId );
 			window.alert( "Perdu !" );
-			// Relancer le jeu
+			// Refresh to restart
 			window.location.reload( true );
 		};
 
-		// init game: Loads the spritesheet, then launches a function when it's done loading.
 		window.addEventListener( "load", init );
 		oApplication.canvas.addEventListener( "click", start );
-
-
-		
-
 	};
 
 } )();
