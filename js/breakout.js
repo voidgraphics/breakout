@@ -40,9 +40,27 @@
 		var oPlatform = {
 			"width": 100,
 			"height": 10,
-			"init": function(){},
-			"update": function(){},
-			"render": function(){}
+			"color": "white",
+			"posX": oApplication.canvas.width / 2 - 50,
+			"posY": oApplication.canvas.height - 30,
+			"init": function(){
+			},
+			"update": function( oEvent ){
+				if( oEvent.keyCode == 37 ){
+					// Left key
+					console.log( "Left" );
+					this.posX-=10;
+				} else if( oEvent.keyCode == 39 ) {
+					// Right key
+					console.log( "Right" );
+					this.posX+=10;
+				}
+			},
+			"render": function(){
+				var ctx = oApplication.context;
+				ctx.fillStyle = this.color;
+				ctx.fillRect( this.posX, this.posY, this.width, this.height );
+			}
 		};
 
 
@@ -114,7 +132,6 @@
 				aBricks[ i ].update();
 			}
 			// update platform
-			oPlatform.update();
 
 			oPlatform.render();
 		};
@@ -133,16 +150,7 @@
 
 
 		// TODO: Modifier la position de platform
-		window.addEventListener( "keypress", function( e ){
-			if( e.keyCode == 37 ){
-				// Left key
-				console.log( "Left" );
-
-			} else if( e.keyCode == 39 ) {
-				// Right key
-				console.log( "Right" );
-			}
-		} );
+		window.addEventListener( "keypress", oPlatform.update.bind( oPlatform ) );
 
 	};
 
