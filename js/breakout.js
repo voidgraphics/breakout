@@ -37,6 +37,8 @@
 			this.render();
 		};
 
+		Brick.spacing = 40;
+
 		var oPlatform = {
 			"width": 100,
 			"height": 10,
@@ -65,6 +67,22 @@
 				ctx.fillRect( this.posX, this.posY, this.width, this.height );
 			}
 		};
+
+		var oProjectile = {
+			"color": "#00CC66",
+			"size": 15,
+			"speed": 20,
+			"posX": oApplication.canvas.width / 2 - 15 / 2,
+			"posY": oApplication.canvas.height - 45,
+			"update": function() {
+				this.render();
+			},
+			"render": function() {
+				var ctx = oApplication.context;
+				ctx.fillStyle = this.color;
+				ctx.fillRect( this.posX, this.posY, this.size, this.size );
+			}
+		}
 
 
 		// start game
@@ -96,15 +114,14 @@
 				iYOffset = iPaddingY, 
 				topBrickCount = 8, 
 				lineNumber = 1, 
-				maxLines = 8, 
-				iXSpacing = 40;
+				maxLines = 8;
 			console.log( "Generating bricks:" );
 			for( var i = 1; i <= topBrickCount ; i++ ){
 				aBricks.push( new Brick( iXOffset, iYOffset ) );
 				console.log( "Created a brick!" );
 
 				if( i == topBrickCount ){
-					iXOffset =  iPaddingX + lineNumber * ( ( aBricks[0].iWidth / 2 ) + ( iXSpacing - aBricks[0].iWidth ) / 2 );
+					iXOffset =  iPaddingX + lineNumber * ( ( aBricks[0].iWidth / 2 ) + ( Brick.spacing - aBricks[0].iWidth ) / 2 );
 					iYOffset += 25;
 					lineNumber++;
 					topBrickCount--;
@@ -112,7 +129,7 @@
 						i = 0;
 					}
 				} else {
-					iXOffset += iXSpacing;
+					iXOffset += Brick.spacing;
 				}
 			}
 			console.log("Done! Ready to start...");
@@ -124,6 +141,9 @@
 			ctx.font = "700 36px 'Avenir Next'";
 			ctx.textAlign = "center";
 			ctx.fillText("CLICK TO START", oApplication.width / 2, oApplication.height / 2);
+			ctx.font = "500 12px 'Avenir Next'";
+			ctx.textAlign = "center";
+			ctx.fillText("Code by Adrien Leloup, 2284", oApplication.width / 2, oApplication.height / 1.2);
 		}
 
 		// Called at each animation frame request
@@ -138,8 +158,9 @@
 				aBricks[ i ].update();
 			}
 			// update platform
-
 			oPlatform.render();
+			// update projectile
+			oProjectile.update();
 		};
 
 		// Game over
