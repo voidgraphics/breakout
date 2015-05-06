@@ -74,33 +74,22 @@
 			"angle": 45,
 			"update": function() {
 				// Movement
-				var newX, newY;
+				var newX, newY, side;
 
 				// Hitting left side of canvas
 				if( this.posX <= 0 ){
-					if( this.angle == -45 ){
-						this.angle = 45;
-					} else if( this.angle == -135 ){
-						this.angle = 135;
-					}
+					side = "left";
+					this.angle = fRebound( this.angle, side );
 				}
 				// Hitting top side of canvas
 				if( this.posY <= 0 ){
-					if( this.angle == 45 ){
-						this.angle = 135;
-					} else if( this.angle == -45 ){
-						this.angle = -135;
-					} else if ( this.angle = 0 ) {
-						this.angle = 180;
-					}
+					side = "top";
+					this.angle = fRebound( this.angle, side );
 				}
 				// Hitting right side of canvas
 				if( this.posX + this.size >= oSourceCanvasRect.width ){
-					if( this.angle == 45 ){
-						this.angle = -45;
-					} else if( this.angle == 135 ){
-						this.angle = -135;
-					} 
+					side = "right";
+					this.angle = fRebound( this.angle, side );
 				}
 				// Hitting bottom side of canvas
 				if( this.posY + this.size > oSourceCanvasRect.height ){
@@ -199,16 +188,44 @@
 				if( oProjectile.posY <= element.y + element.height && oProjectile.posX >= element.x && oProjectile.posX + oProjectile.size >= element.x && oProjectile.posX + oProjectile.size <= element.x + element.width && oProjectile.posY > element.y ){
 					// Projectile top hits brick's bottom
 					aBricks.splice(aBricks.indexOf(element), 1);
+					console.log( "rebound!" );
+					oProjectile.angle = fRebound( oProjectile.angle, "top" );
 				} else if ( oProjectile.posY + oProjectile.size >= element.y && oProjectile.posX >= element.x  && oProjectile.posX + oProjectile.size >= element.x && oProjectile.posX + oProjectile.size <= element.x + element.width && oProjectile.posY <= element.y + element.height ){
 					// Projectile's bottom hits brick's top
 					aBricks.splice(aBricks.indexOf(element), 1);
+					console.log( "rebound!" );
+					oProjectile.angle = fRebound( oProjectile.angle, "bottom" );
 				} else if ( ((oProjectile.posY >= element.y + element.height && oProjectile.posY + oProjectile.size >= element.y + element.height && oProjectile.posY < element.y + element.height ) 
 							|| ( oProjectile.posY <= element.y && oProjectile.posY + oProjectile.size <= element.y + element.height && oProjectile.posY + oProjectile.size > element.y ) ) 
 							&& ( oProjectile.posX <= element.x + element.width && oProjectile.posX >= element.x )  ) {
 					// Projectile's left hits brick's right
 					aBricks.splice(aBricks.indexOf(element), 1);
+					console.log( "rebound!" );
+					oProjectile.angle = fRebound( oProjectile.angle, "left" );
 				}
 			} );
+		};
+
+		var fRebound = function( angle, side ){
+			if( angle == -45 && side == "left" ){
+				angle = 45;
+			} else if( angle == -135 && side == "left" ){
+				angle = 135;
+			} else if( angle == 45 && side == "top" ){
+				angle = 135;
+			} else if( angle == -45 && side == "top" ){
+				angle = -135;
+			} else if( angle == 45 && side == "right" ){
+				angle = -45;
+			} else if( angle == 135 && side == "right" ){
+				angle = -135;
+			} else if( angle == -135 && side == "bottom" ){
+				angle = -45;
+			} else if( angle == 135 && side == "bottom" ){
+				angle = 45;
+			}
+
+			return angle;
 		};
 
 		var fShowStartscreen = function() {
