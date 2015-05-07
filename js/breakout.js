@@ -59,7 +59,7 @@
 				} else if ( oEvent.keyCode == 40 ){
 					oProjectile.speed = 0.5;
 				} else if ( oEvent.keyCode == 38 ){
-					oProjectile.speed = 1;
+					oProjectile.speed = 5;
 				}
 			},
 			"render": function(){
@@ -72,7 +72,7 @@
 		var oProjectile = {
 			"color": "#00CC66",
 			"size": 15,
-			"speed": 1,
+			"speed": 5,
 			"posX": oApplication.canvas.width / 2 - 15 / 2,
 			"posY": oApplication.canvas.height - 45,
 			"angle": -45,
@@ -174,7 +174,7 @@
 
 				if( i == topBrickCount ){
 					iXOffset =  iPaddingX + lineNumber * ( ( aBricks[0].width / 2 ) + ( Brick.spacing - aBricks[0].width ) / 2 );
-					iYOffset += 25;
+					iYOffset += 20;
 					lineNumber++;
 					topBrickCount--;
 					if( lineNumber <= maxLines ){
@@ -197,13 +197,17 @@
 					aBricks.splice(aBricks.indexOf(element), 1);
 					console.log( "rebound from bricks bottom!" );
 					oProjectile.angle = fRebound( oProjectile.angle, "top" );
-				} else if ( oProjectile.posY + oProjectile.size >= element.y && oProjectile.posX >= element.x  && oProjectile.posX + oProjectile.size >= element.x && oProjectile.posX + oProjectile.size <= element.x + element.width && oProjectile.posY <= element.y + element.height ){
+				} else if ( ( oProjectile.posY + oProjectile.size == element.y && oProjectile.posY <= element.y )
+					&& ( ( oProjectile.posX >= element.x && oProjectile.posX + oProjectile.size <= element.x + element.width)
+					|| ( oProjectile.posX >= element.x && oProjectile.posX + oProjectile.size >= element.x + element.width && oProjectile.posX <= element.x + element.width )
+					|| ( oProjectile.posX <= element.x && oProjectile.posX + oProjectile.size >= element.x && oProjectile.posX + oProjectile.size <= element.x + element.width ) ) ){
 					// Projectile's bottom hits brick's top
 					aBricks.splice(aBricks.indexOf(element), 1);
 					console.log( "rebound from bricks top!" );
 					oProjectile.angle = fRebound( oProjectile.angle, "bottom" );
 				} else if ( ( ( oProjectile.posY <= element.y + element.height && oProjectile.posY + oProjectile.size >= element.y + element.height && oProjectile.posY < element.y + element.height ) 
-							|| ( oProjectile.posY <= element.y && oProjectile.posY + oProjectile.size <= element.y + element.height && oProjectile.posY + oProjectile.size > element.y ) ) 
+							|| ( oProjectile.posY <= element.y && oProjectile.posY + oProjectile.size <= element.y + element.height && oProjectile.posY + oProjectile.size > element.y ) 
+							|| ( oProjectile.posY >= element.y && oProjectile.posY <= element.y + element.height && oProjectile.posY + oProjectile.size >= element.y + element.height ) ) 
 							&& ( oProjectile.posX <= element.x + element.width && oProjectile.posX >= element.x ) ) {
 					// Projectile's left hits brick's right
 					aBricks.splice(aBricks.indexOf(element), 1);
