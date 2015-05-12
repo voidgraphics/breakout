@@ -4,8 +4,37 @@
 
 	window.Breakout = function( oApplication ){
 
+		// Constants (Bricks)
+		var BRICKWIDTH 			= 30,
+			BRICKHEIGHT 		= 8,
+			BRICKXMARGIN 		= 10,
+			BRICKYMARGIN 		= 15,
+			DEFAULTBRICKCOLOR	= "crimson",
+			HARDERCOLOR			= "#7F0000",
+			WIDENERCOLOR		= "pink",
+			FASTERCOLOR			= "yellow",
+			SLOWERCOLOR			= "blue";
+
+		// Constants (Platform)
+		var PLATFORMWIDTH 		= 100,
+			PLATFORMHEIGHT 		= 10,
+			PLATFORMCOLOR		= "white",
+			PLATFORMSPEED 		= 30,
+			PLATFORMMAXSPEED 	= 40,
+			PLATFORMMINSPEED 	= 30;
+
+		// Constants (Projectile)
+		var PROJECTILESIZE		= 15,
+			PROJECTILEMAXSIZE	= 18,
+			PROJECTILECOLOR		= "#00CC66",
+			PROJECTILESPEED 	= 5,
+			PROJECTILEMAXSPEED 	= 9,
+			PROJECTILEMINSPEED	= 3;
+
+
 		// Global params
 		var iAnimationRequestId = 0,
+			iScore = 0,
 			aBricks = [],
 			oSourceCanvasRect = oApplication.canvas.getBoundingClientRect();
 
@@ -13,29 +42,50 @@
 		var oBackground = {
 			"color": "black",
 			"render": function() {
-				oApplication.context.fillStyle = this.color;
-				oApplication.context.fillRect( 0, 0, oApplication.width, oApplication.height );
+				var ctx = oApplication.context;
+				ctx.fillStyle = this.color;
+				ctx.fillRect( 0, 0, oApplication.width, oApplication.height );
+
+				ctx.fillStyle = "crimson";
+				ctx.textAlign = "left";
+				ctx.font = "500 12px 'Avenir Next'";
+				ctx.fillText("Briques détruites : " + iScore, 20, oApplication.height - 20);
 			}
 		};
 
 		// Bricks
-		var Brick = function( iX, iY, isSpecial ) {
-			this.width = 30;
-			this.height = 8;
-			this.x = iX;
-			this.y = iY;
-			this.cx = iX + 15;
-			this.cy = iY + 4;
-			if( isSpecial ){
-				this.color = "yellow";
-			} else {
-				this.color = "crimson";
+		var Brick = function( iX, iY, sSpeciality ) {
+			this.width = 		BRICKWIDTH;
+			this.height = 		BRICKHEIGHT;
+			this.x = 			iX;
+			this.y = 			iY;
+			this.cx = 			iX + BRICKWIDTH / 2;
+			this.cy = 			iY + BRICKHEIGHT / 2;
+			this.color = 		DEFAULTBRICKCOLOR;
+			this.hits = 		0;
+			this.maxHits = 		1;
+			this.speciality = 	sSpeciality;
+			if( sSpeciality == "harder" ){
+				this.color = HARDERCOLOR;
+				this.maxHits = 3;
+			} else if( sSpeciality == "widener" ){
+				this.color = WIDENERCOLOR;
+			} else if( sSpeciality == "faster" ){
+				this.color = FASTERCOLOR;
+			} else if( sSpeciality == "slower" ){
+				this.color = SLOWERCOLOR;
 			}
 		};
 
 		Brick.prototype.render = function() {
 			aBricks.forEach( function( element ) {
-				oApplication.context.fillStyle = element.color;
+				if( element.hits == 1 ){
+					oApplication.context.fillStyle = "#BF0000";
+				} else if( element.hits == 2 ){	
+					oApplication.context.fillStyle = "crimson";
+				} else {
+					oApplication.context.fillStyle = element.color;
+				}
 				oApplication.context.fillRect( element.x, element.y, element.width, element.height );
 			}, this );
 		};
@@ -44,13 +94,11 @@
 			this.render();
 		};
 
-		Brick.spacing = 40;
-
 		var oPlatform = {
-			"width": 100,
-			"height": 10,
-			"color": "white",
-			"speed": 30,
+			"width": PLATFORMWIDTH,
+			"height": PLATFORMHEIGHT,
+			"color": PLATFORMCOLOR,
+			"speed": PLATFORMSPEED,
 			"posX": oApplication.canvas.width / 2 - 50,
 			"posY": oApplication.canvas.height - 30,
 			"update": function( oEvent ){
@@ -77,14 +125,14 @@
 		};
 
 		var oProjectile = {
-			"color": "#00CC66",
-			"size": 15,
-			"speed": 5,
-			"posX": oApplication.canvas.width / 2 - 15 / 2,
-			"posY": oApplication.canvas.height - 45,
-			"cx": 0,
-			"cy": 0,
-			"angle": -45,
+			"color": 	PROJECTILECOLOR,
+			"size": 	PROJECTILESIZE,
+			"speed": 	PROJECTILESPEED,
+			"posX": 	oApplication.canvas.width / 2 - PROJECTILESIZE / 2,
+			"posY": 	oApplication.canvas.height - 45,
+			"cx": 		0,
+			"cy": 		0,
+			"angle": 	-45,
 			"update": function() {
 				// Movement
 				var newX, newY, side;
@@ -165,35 +213,45 @@
 		};
 
 		var fGenerateBricks = function() {
-			var iPaddingX = 150, 
-				iPaddingY = 130, 
+			var iPaddingX = 110, 
+				iPaddingY = 30, 
 				iXOffset = iPaddingX, 
 				iYOffset = iPaddingY, 
-				topBrickCount = 8, 
+				topBrickCount = 10, 
 				lineNumber = 1, 
-				maxLines = 8,
-				isSpecial, 
+				maxLines = 10,
+				speciality, 
 				k = 0;
 			console.log( "Generating bricks:" );
 			for( var i = 1; i <= topBrickCount ; i++ ){
-				isSpecial = false;
-				console.log( "Created a brick!" );
+				speciality = "none";
 				k++;
-				if( k == 10 ){
-					isSpecial = true;
+				if( k <= 19 ){
+					speciality = "harder";
 				}
-				aBricks.push( new Brick( iXOffset, iYOffset, isSpecial ) );
+				if( k == 15 ){
+					speciality = "faster";
+				}
+				if( k == 20 || k == 30 ){
+					speciality = "slower";
+				}
+				if( k == 1 ){
+					speciality = "bigger";
+				}
+
+				aBricks.push( new Brick( iXOffset, iYOffset, speciality ) );
+				console.log( "Created a brick!" );
 
 				if( i == topBrickCount ){
-					iXOffset =  iPaddingX + lineNumber * ( ( aBricks[0].width / 2 ) + ( Brick.spacing - aBricks[0].width ) / 2 );
-					iYOffset += 20;
+					iXOffset =  iPaddingX + lineNumber * ( ( aBricks[0].width / 2 ) + ( ( BRICKWIDTH + BRICKXMARGIN ) - aBricks[0].width ) / 2 );
+					iYOffset += ( BRICKHEIGHT + BRICKYMARGIN );
 					lineNumber++;
 					topBrickCount--;
 					if( lineNumber <= maxLines ){
 						i = 0;
 					}
 				} else {
-					iXOffset += Brick.spacing;
+					iXOffset += ( BRICKWIDTH + BRICKXMARGIN );
 				}
 			}
 			console.log("Done! Ready to start...");
@@ -232,14 +290,13 @@
 				py = oProjectile.posY;
 			}
 
-			aBricks.forEach( function( element, index, array ){
+			aBricks.forEach( function( element ){
 
 				// Brick hitbox
 				x = element.x - oProjectile.size / 2;
 				y = element.y - oProjectile.size / 2;
 				xx = x + element.width + oProjectile.size;
 				yy = y + element.height + oProjectile.size;
-
 
 				if( ( oProjectile.cx > x && oProjectile.cx < xx ) && ( oProjectile.cy > y && oProjectile.cy < yy ) ) {
 					// We have contact with the brick
@@ -249,7 +306,6 @@
 							If the angle is -45 (top left direction), we can only touch the brick's bottom or right side
 							We calculate the ref point's distance from the bottom and right sides of the brick.
 						*/
-
 						distX = ( element.x + element.width ) - px;
 						distY = ( element.y + element.height ) - py;
 
@@ -302,8 +358,34 @@
 						}
 
 					}
+					element.hits++;
 
-					aBricks.splice(aBricks.indexOf(element), 1);
+
+					if( element.hits == element.maxHits ){
+						switch( element.speciality ){
+							case "widener":
+								oPlatform.width -= 50;
+								break;
+							case "faster":
+								oProjectile.speed += 2;
+								( oProjectile.speed > PROJECTILEMAXSPEED ) && ( oProjectile.speed = PROJECTILEMAXSPEED );
+								console.log("Increasing speed. New speed = " + oProjectile.speed );
+								break;
+							case "slower":
+								oProjectile.speed -= 2;
+								( oProjectile.speed < PROJECTILEMINSPEED ) && ( oProjectile.speed = PROJECTILEMINSPEED );
+								console.log( "Decreasing speed. New speed = " + oProjectile.speed );
+								break;
+							case "bigger":
+								oProjectile.size += 3;
+								( oProjectile.size > PROJECTILEMAXSIZE ) && ( oProjectile.size = PROJECTILEMAXSIZE );
+								break;
+							default:
+								break;
+						}
+						iScore++;
+						aBricks.splice(aBricks.indexOf(element), 1);
+					}
 
 				}
 					
@@ -334,12 +416,15 @@
 
 		var fShowStartscreen = function() {
 			var ctx = oApplication.context;
+
+			ctx.fillStyle = "cadetblue";
+			ctx.fillRect( 0, 0, oApplication.canvas.width, oApplication.canvas.height );
+
 			ctx.fillStyle = "white";
 			ctx.font = "700 36px 'Avenir Next'";
 			ctx.textAlign = "center";
 			ctx.fillText("CLICK TO START", oApplication.width / 2, oApplication.height / 2);
 			ctx.font = "500 12px 'Avenir Next'";
-			ctx.textAlign = "center";
 			ctx.fillText("Code by Adrien Leloup, 2284", oApplication.width / 2, oApplication.height / 1.2);
 		};
 
