@@ -4,18 +4,21 @@
 
 	window.Breakout = function( oApplication ){
 
-		// Constants (Bricks)
+		// Constants
+		var EFFECTDURATION		= 3000;
+
+		// (Bricks)
 		var BRICKWIDTH 			= 30,
 			BRICKHEIGHT 		= 8,
 			BRICKXMARGIN 		= 10,
-			BRICKYMARGIN 		= 15,
+			BRICKYMARGIN 		= 20,
 			DEFAULTBRICKCOLOR	= "crimson",
 			HARDERCOLOR			= "#7F0000",
 			WIDENERCOLOR		= "pink",
 			FASTERCOLOR			= "yellow",
 			SLOWERCOLOR			= "blue";
 
-		// Constants (Platform)
+		// (Platform)
 		var PLATFORMWIDTH 		= 100,
 			PLATFORMHEIGHT 		= 10,
 			PLATFORMCOLOR		= "white",
@@ -23,9 +26,9 @@
 			PLATFORMMAXSPEED 	= 40,
 			PLATFORMMINSPEED 	= 30;
 
-		// Constants (Projectile)
+		// (Projectile)
 		var PROJECTILESIZE		= 15,
-			PROJECTILEMAXSIZE	= 18,
+			PROJECTILEMAXSIZE	= 20,
 			PROJECTILECOLOR		= "#00CC66",
 			PROJECTILESPEED 	= 5,
 			PROJECTILEMAXSPEED 	= 9,
@@ -36,7 +39,12 @@
 		var iAnimationRequestId = 0,
 			iScore = 0,
 			aBricks = [],
-			oSourceCanvasRect = oApplication.canvas.getBoundingClientRect();
+			oSourceCanvasRect = oApplication.canvas.getBoundingClientRect(),
+			iTime = null,
+			iBiggerStartedTime = null,
+			iShorterStartedTime = null,
+			iSlowerStartedTime = null,
+			iFasterStartedTime = null;
 
 		// Background
 		var oBackground = {
@@ -68,7 +76,7 @@
 			if( sSpeciality == "harder" ){
 				this.color = HARDERCOLOR;
 				this.maxHits = 3;
-			} else if( sSpeciality == "widener" ){
+			} else if( sSpeciality == "shorter" ){
 				this.color = WIDENERCOLOR;
 			} else if( sSpeciality == "faster" ){
 				this.color = FASTERCOLOR;
@@ -213,13 +221,13 @@
 		};
 
 		var fGenerateBricks = function() {
-			var iPaddingX = 110, 
+			var iPaddingX = 150, 
 				iPaddingY = 30, 
 				iXOffset = iPaddingX, 
 				iYOffset = iPaddingY, 
-				topBrickCount = 10, 
+				topBrickCount = 8, 
 				lineNumber = 1, 
-				maxLines = 10,
+				maxLines = 8,
 				speciality, 
 				k = 0;
 			console.log( "Generating bricks:" );
@@ -237,6 +245,9 @@
 				}
 				if( k == 1 ){
 					speciality = "bigger";
+				}
+				if( k == 24 ){
+					speciality = "shorter";
 				}
 
 				aBricks.push( new Brick( iXOffset, iYOffset, speciality ) );
@@ -360,37 +371,45 @@
 					}
 					element.hits++;
 
-
-					if( element.hits == element.maxHits ){
-						switch( element.speciality ){
-							case "widener":
-								oPlatform.width -= 50;
-								break;
-							case "faster":
-								oProjectile.speed += 2;
-								( oProjectile.speed > PROJECTILEMAXSPEED ) && ( oProjectile.speed = PROJECTILEMAXSPEED );
-								console.log("Increasing speed. New speed = " + oProjectile.speed );
-								break;
-							case "slower":
-								oProjectile.speed -= 2;
-								( oProjectile.speed < PROJECTILEMINSPEED ) && ( oProjectile.speed = PROJECTILEMINSPEED );
-								console.log( "Decreasing speed. New speed = " + oProjectile.speed );
-								break;
-							case "bigger":
-								oProjectile.size += 3;
-								( oProjectile.size > PROJECTILEMAXSIZE ) && ( oProjectile.size = PROJECTILEMAXSIZE );
-								break;
-							default:
-								break;
-						}
-						iScore++;
-						aBricks.splice(aBricks.indexOf(element), 1);
-					}
+					fBrickReact( element );
 
 				}
 					
 			} );
 		};
+
+		var fBrickReact = function( element ){
+			if( element.hits == element.maxHits ){
+				switch( element.speciality ){
+					case "shorter":
+						oPlatform.width -= 50;
+						iShorterStartedTime = ( new Date() ).getTime();
+						break;
+					case "faster":
+						oProjectile.speed += 2;
+						iFasterStartedTime = ( new Date() ).getTime();
+						( oProjectile.speed > PROJECTILEMAXSPEED ) && ( oProjectile.speed = PROJECTILEMAXSPEED );
+						console.log("Increasing speed. New speed = " + oProjectile.speed );
+						break;
+					case "slower":
+						oProjectile.speed -= 2;
+						iSlowerStartedTime = ( new Date() ).getTime();
+						( oProjectile.speed < PROJECTILEMINSPEED ) && ( oProjectile.speed = PROJECTILEMINSPEED );
+						console.log( "Decreasing speed. New speed = " + oProjectile.speed );
+						break;
+					case "bigger":
+						oProjectile.size += 25;
+						iBiggerStartedTime = ( new Date() ).getTime();
+						console.log( iBiggerStartedTime );
+						( oProjectile.size > PROJECTILEMAXSIZE ) && ( oProjectile.size = PROJECTILEMAXSIZE );
+						break;
+					default:
+						break;
+				}
+				iScore++;
+				aBricks.splice(aBricks.indexOf(element), 1);
+			}
+		}
 
 		var fRebound = function( side ){
 
@@ -431,6 +450,19 @@
 		// Called at each animation frame request
 		var fAnimationLoop = function() {
 			iAnimationRequestId = window.requestAnimationFrame( fAnimationLoop );
+
+			// Verify effects duration
+			iTime = ( new Date() ).getTime();
+			if( iTime - iBiggerStartedTime > EFFECTDURATION ){
+				oProjectile.size = PROJECTILESIZE;
+			}
+			if( iTime - iShorterStartedTime > EFFECTDURATION ){
+				oPlatform.width = PLATFORMWIDTH;
+			}
+			if( iTime - iSlowerStartedTime > EFFECTDURATION || iTime - iFasterStartedTime > EFFECTDURATION ){
+				console.log( 'Resetting speed to ' + PROJECTILESPEED );
+				oProjectile.speed = PROJECTILESPEED;
+			}
 			// clear canvas
 			oApplication.context.clearRect( 0, 0, oApplication.width, oApplication.height );
 			// draw background
