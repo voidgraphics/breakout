@@ -101,6 +101,7 @@
 				this.fallingSpeed = 1.7;
 			} else if( sSpeciality == "slower" ){
 				this.color = SLOWERCOLOR;
+				this.frame.sy = 80;
 				this.fallingSpeed = 0.5;
 			}
 		};
