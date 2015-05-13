@@ -15,20 +15,20 @@
 
 
 		// (Bricks)
-		var BRICKWIDTH 			= 30,
-			BRICKHEIGHT 		= 8,
+		var BRICKWIDTH 			= 36,
+			BRICKHEIGHT 		= 12,
 			BRICKXMARGIN 		= 10,
-			BRICKYMARGIN 		= 20,
-			DEFAULTBRICKCOLOR	= "crimson",
-			HARDERCOLOR			= "#7F0000",
-			WIDENERCOLOR		= "pink",
-			FASTERCOLOR			= "yellow",
-			SLOWERCOLOR			= "blue";
+			BRICKYMARGIN 		= 15,
+			DEFAULTBRICKCOLOR	= LIGHTBROWN,
+			HARDERCOLOR			= RED,
+			WIDENERCOLOR		= BEIGE,
+			FASTERCOLOR			= BEIGE,
+			SLOWERCOLOR			= GREEN;
 
 		// (Platform)
 		var PLATFORMWIDTH 		= 100,
 			PLATFORMHEIGHT 		= 10,
-			PLATFORMCOLOR		= "white",
+			PLATFORMCOLOR		= BEIGE,
 			PLATFORMSPEED 		= 30,
 			PLATFORMMAXSPEED 	= 40,
 			PLATFORMMINSPEED 	= 30;
@@ -36,7 +36,7 @@
 		// (Projectile)
 		var PROJECTILESIZE		= 15,
 			PROJECTILEMAXSIZE	= 20,
-			PROJECTILECOLOR		= "#00CC66",
+			PROJECTILECOLOR		= GREEN,
 			PROJECTILESPEED 	= 5,
 			PROJECTILEMAXSPEED 	= 9,
 			PROJECTILEMINSPEED	= 3;
@@ -44,6 +44,8 @@
 
 		// Global params
 		var iAnimationRequestId = 0,
+			oSpriteSheet = null,
+			sSpriteSheetSrc = "./img/sprite.png",
 			iScore = 0,
 			aBricks = [],
 			oSourceCanvasRect = oApplication.canvas.getBoundingClientRect(),
@@ -55,21 +57,27 @@
 
 		// Background
 		var oBackground = {
-			"color": "black",
+			"color": BROWN,
 			"render": function() {
 				var ctx = oApplication.context;
 				ctx.fillStyle = this.color;
 				ctx.fillRect( 0, 0, oApplication.width, oApplication.height );
 
-				ctx.fillStyle = "crimson";
+				ctx.fillStyle = RED;
 				ctx.textAlign = "left";
-				ctx.font = "500 12px 'Avenir Next'";
-				ctx.fillText("Briques détruites : " + iScore, 20, oApplication.height - 20);
+				ctx.font = "500 12px 'Lato Black'";
+				ctx.fillText("D E S T R O Y E D  :  " + iScore, 20, oApplication.height - 20);
 			}
 		};
 
 		// Bricks
 		var Brick = function( iX, iY, sSpeciality ) {
+			this.frame = {
+				sx: 0,
+				sy: 0,
+				sw: BRICKWIDTH,
+				sh: BRICKHEIGHT
+			}
 			this.width = 		BRICKWIDTH;
 			this.height = 		BRICKHEIGHT;
 			this.x = 			iX;
@@ -84,6 +92,7 @@
 			if( sSpeciality == "harder" ){
 				this.color = HARDERCOLOR;
 				this.maxHits = 3;
+				this.frame.sy = 50;
 				this.fallingSpeed = 2;
 			} else if( sSpeciality == "shorter" ){
 				this.color = WIDENERCOLOR;
@@ -99,13 +108,23 @@
 		Brick.prototype.render = function() {
 			aBricks.forEach( function( element ) {
 				if( element.hits == 1 ){
-					oApplication.context.fillStyle = "#BF0000";
+					element.frame.sy = 25;
 				} else if( element.hits == 2 ){	
-					oApplication.context.fillStyle = "crimson";
-				} else {
-					oApplication.context.fillStyle = element.color;
+					element.frame.sy = 0;
 				}
+				oApplication.context.fillStyle = element.color;
 				oApplication.context.fillRect( element.x, element.y, element.width, element.height );
+				oApplication.context.drawImage( 
+					oSpriteSheet, 
+					element.frame.sx, 
+					element.frame.sy, 
+					element.frame.sw,
+					element.frame.sh,
+					element.x,
+					element.y,
+					element.width,
+					element.height
+				);
 			}, this );
 		};
 
@@ -248,7 +267,6 @@
 				oMenu.render();
 			},
 			"render": function() {
-				console.log('drawing menu frame');
 				var ctx = oApplication.context, text;
 				ctx.clearRect( 0, 0, oApplication.width, oApplication.height );
 
@@ -260,6 +278,17 @@
 				this.bricks.forEach( function( element ){
 					ctx.fillStyle = element.color;
 					ctx.fillRect( element.x, element.y, element.width, element.height );
+					oApplication.context.drawImage( 
+						oSpriteSheet, 
+						element.frame.sx, 
+						element.frame.sy, 
+						element.frame.sw,
+						element.frame.sh,
+						element.x,
+						element.y,
+						element.width,
+						element.height
+					);
 				} );
 
 				// Text
@@ -311,7 +340,7 @@
 		};
 
 		var fGenerateBricks = function() {
-			var iPaddingX = 150, 
+			var iPaddingX = 120, 
 				iPaddingY = 30, 
 				iXOffset = iPaddingX, 
 				iYOffset = iPaddingY, 
@@ -377,18 +406,23 @@
 			*/
 			var x, xx, y, yy, cx, cy, px, py, distX, distY;
 			// Moving the projectile's reference point
-			if( oProjectile.angle == 45 ){
-				px = oProjectile.posX + oProjectile.size;
-				py = oProjectile.posY;
-			} else if ( oProjectile.angle == -135 ){
-				px = oProjectile.posX;
-				py = oProjectile.posY + oProjectile.size;
-			} else if ( oProjectile.angle == 135 ){
-				px = oProjectile.posX + oProjectile.size;
-				py = oProjectile.posY + oProjectile.size;
-			} else if ( oProjectile.angle == -45 ){
-				px = oProjectile.posX;
-				py = oProjectile.posY;
+			switch( oProjectile.angle ){
+				case 45:
+					px = oProjectile.posX + oProjectile.size;
+					py = oProjectile.posY;
+					break;
+				case -45:
+					px = oProjectile.posX;
+					py = oProjectile.posY;
+					break;
+				case 135:
+					px = oProjectile.posX + oProjectile.size;
+					py = oProjectile.posY + oProjectile.size;
+					break;
+				case -135:
+					px = oProjectile.posX;
+					py = oProjectile.posY + oProjectile.size;
+					break;
 			}
 
 			aBricks.forEach( function( element ){
@@ -568,7 +602,9 @@
 			window.location.reload( true );
 		};
 
-		window.addEventListener( "load", init );
+		oSpriteSheet = new Image();
+		oSpriteSheet.addEventListener( "load", init );
+		oSpriteSheet.src = sSpriteSheetSrc;
 		oApplication.canvas.addEventListener( "click", start );
 	};
 
