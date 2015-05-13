@@ -36,7 +36,7 @@
 		var PROJECTILESIZE		= 15,
 			PROJECTILEMAXSIZE	= 20,
 			PROJECTILECOLOR		= GREEN,
-			PROJECTILESPEED 	= 1,
+			PROJECTILESPEED 	= 7,
 			PROJECTILEMAXSPEED 	= 9,
 			PROJECTILEMINSPEED	= 3;
 
@@ -336,7 +336,7 @@
 			window.cancelAnimationFrame( iAnimationRequestId );
 			console.log( "Starting game!" );
 			// listen to arrow keys to trigger platform movement
-			window.addEventListener( "keypress", oPlatform.update.bind( oPlatform ) );
+			window.addEventListener( "keydown", oPlatform.update.bind( oPlatform ) );
 			oApplication.canvas.removeEventListener( "click", start );
 			fAnimationLoop();
 		};
