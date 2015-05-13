@@ -191,7 +191,7 @@
 					this.posX+=this.speed;
 				} else {
 					// Mouse control
-					this.posX = oEvent.clientX - oSourceCanvasRect.left - PLATFORMWIDTH / 2;
+					this.posX = oEvent.clientX - oSourceCanvasRect.left - this.width / 2;
 				}
 				( this.posX < 0 ) && ( this.posX = 0 );
 				( this.posX > oSourceCanvasRect.width - this.width ) && ( this.posX = oSourceCanvasRect.width - this.width );
@@ -393,7 +393,7 @@
 					speciality = "slower";
 				}
 				if( k == 1 ){
-					speciality = "slower";
+					speciality = "shorter";
 				}
 				if( k == 24 ){
 					speciality = "shorter";
@@ -546,8 +546,8 @@
 			if( element.hits == element.maxHits ){
 				switch( element.speciality ){
 					case "shorter":
-						oPlatform.width -= 50;
-						oPlatform.posX += 25;
+						oPlatform.width = PLATFORMWIDTH / 2;
+						oPlatform.posX += PLATFORMWIDTH / 4;
 						iShorterStartedTime = ( new Date() ).getTime();
 						break;
 					case "faster":
@@ -613,10 +613,9 @@
 			}
 			if( oPlatform.width != PLATFORMWIDTH && iTime - iShorterStartedTime > EFFECTDURATION ){
 				oPlatform.width = PLATFORMWIDTH;
-				oPlatform.posX -= 25;
+				oPlatform.posX -= PLATFORMWIDTH / 4;
 			}
 			if( oProjectile.speed < PROJECTILESPEED && ( iTime - iSlowerStartedTime > EFFECTDURATION ) ){
-				console.log('slower');
 				console.log( 'Resetting speed to ' + PROJECTILESPEED );
 				oProjectile.speed = PROJECTILESPEED;
 			}
