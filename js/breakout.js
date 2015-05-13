@@ -62,14 +62,42 @@
 		var oBackground = {
 			"color": BROWN,
 			"render": function() {
+				// Background color
 				var ctx = oApplication.context;
 				ctx.fillStyle = this.color;
 				ctx.fillRect( 0, 0, oApplication.width, oApplication.height );
-
+				// Score
 				ctx.fillStyle = RED;
 				ctx.textAlign = "left";
 				ctx.font = "500 12px 'Lato Black'";
 				ctx.fillText("D E S T R O Y E D  :  " + iScore, 20, oApplication.height - 20);
+				//Active effects
+				if( oProjectile.speed > PROJECTILESPEED ){
+					oApplication.context.drawImage( 
+						oSpriteSheet, 
+						45, 
+						0, 
+						15,
+						15,
+						oApplication.width - 35,
+						oApplication.height - 30,
+						15,
+						15
+					);
+				}
+				if( oProjectile.speed < PROJECTILESPEED ){
+					oApplication.context.drawImage( 
+						oSpriteSheet, 
+						45, 
+						24, 
+						15,
+						15,
+						oApplication.width - 35,
+						oApplication.height - 30,
+						15,
+						15
+					);
+				}
 			}
 		};
 
@@ -365,7 +393,7 @@
 					speciality = "slower";
 				}
 				if( k == 1 ){
-					speciality = "shorter";
+					speciality = "slower";
 				}
 				if( k == 24 ){
 					speciality = "shorter";
