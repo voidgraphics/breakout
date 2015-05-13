@@ -8,7 +8,7 @@
 			CONSTANTS.
 			BEWARE! modifying these can break the game's appearance.
 		**************************************************************/
-		var EFFECTDURATION		= 3000,
+		var EFFECTDURATION		= 10000,
 			BROWN				= "#3d3234",
 			LIGHTBROWN			= "#6b5d60",
 			GREEN				= "#70877f",
@@ -37,7 +37,7 @@
 			PROJECTILEMAXSIZE	= 20,
 			PROJECTILECOLOR		= GREEN,
 			PROJECTILESPEED 	= 7,
-			PROJECTILEMAXSPEED 	= 9,
+			PROJECTILEMAXSPEED 	= 10,
 			PROJECTILEMINSPEED	= 3;
 
 
@@ -158,17 +158,16 @@
 				if( oEvent.keyCode == 37 ){
 					// Left key
 					this.posX-=this.speed;
-					( this.posX < 0 ) && ( this.posX = 0 );
-					
 				} else if( oEvent.keyCode == 39 ) {
 					// Right key
 					this.posX+=this.speed;
-					( this.posX > oSourceCanvasRect.width - this.width ) && ( this.posX = oSourceCanvasRect.width - this.width );
-				} else if ( oEvent.keyCode == 40 ){
-					oProjectile.speed -= 5;
-				} else if ( oEvent.keyCode == 38 ){
-					oProjectile.speed += 5;
+				} else {
+					// Mouse control
+					this.posX = oEvent.clientX - oSourceCanvasRect.left - PLATFORMWIDTH / 2;
 				}
+				( this.posX < 0 ) && ( this.posX = 0 );
+				( this.posX > oSourceCanvasRect.width - this.width ) && ( this.posX = oSourceCanvasRect.width - this.width );
+
 			},
 			"render": function(){
 				var ctx = oApplication.context;
@@ -337,6 +336,7 @@
 			console.log( "Starting game!" );
 			// listen to arrow keys to trigger platform movement
 			window.addEventListener( "keydown", oPlatform.update.bind( oPlatform ) );
+			window.addEventListener( "mousemove", oPlatform.update.bind( oPlatform ) );
 			oApplication.canvas.removeEventListener( "click", start );
 			fAnimationLoop();
 		};
@@ -365,7 +365,7 @@
 					speciality = "slower";
 				}
 				if( k == 1 ){
-					speciality = "bigger";
+					speciality = "shorter";
 				}
 				if( k == 24 ){
 					speciality = "shorter";
@@ -519,6 +519,7 @@
 				switch( element.speciality ){
 					case "shorter":
 						oPlatform.width -= 50;
+						oPlatform.posX += 25;
 						iShorterStartedTime = ( new Date() ).getTime();
 						break;
 					case "faster":
@@ -584,12 +585,14 @@
 			}
 			if( oPlatform.width != PLATFORMWIDTH && iTime - iShorterStartedTime > EFFECTDURATION ){
 				oPlatform.width = PLATFORMWIDTH;
+				oPlatform.posX -= 25;
 			}
-			if( oProjectile.speed != PROJECTILESPEED && ( iTime - iSlowerStartedTime > EFFECTDURATION ) ){
+			if( oProjectile.speed < PROJECTILESPEED && ( iTime - iSlowerStartedTime > EFFECTDURATION ) ){
+				console.log('slower');
 				console.log( 'Resetting speed to ' + PROJECTILESPEED );
 				oProjectile.speed = PROJECTILESPEED;
 			}
-			if( oProjectile.speed != PROJECTILESPEED && ( iTime - iFasterStartedTime > EFFECTDURATION ) ){
+			if( oProjectile.speed > PROJECTILESPEED && ( iTime - iFasterStartedTime > EFFECTDURATION ) ){
 				console.log( 'Resetting speed to ' + PROJECTILESPEED );
 				oProjectile.speed = PROJECTILESPEED;
 			}
