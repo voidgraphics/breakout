@@ -180,27 +180,27 @@
 			"height": PLATFORMHEIGHT,
 			"color": PLATFORMCOLOR,
 			"speed": PLATFORMSPEED,
-			"posX": oApplication.canvas.width / 2 - 50,
-			"posY": oApplication.canvas.height - 30,
+			"x": oApplication.canvas.width / 2 - 50,
+			"y": oApplication.canvas.height - 30,
 			"update": function( oEvent ){
 				if( oEvent.keyCode == 37 ){
 					// Left key
-					this.posX-=this.speed;
+					this.x-=this.speed;
 				} else if( oEvent.keyCode == 39 ) {
 					// Right key
-					this.posX+=this.speed;
+					this.x+=this.speed;
 				} else {
 					// Mouse control
-					this.posX = oEvent.clientX - oSourceCanvasRect.left - this.width / 2;
+					this.x = oEvent.clientX - oSourceCanvasRect.left - this.width / 2;
 				}
-				( this.posX < 0 ) && ( this.posX = 0 );
-				( this.posX > oSourceCanvasRect.width - this.width ) && ( this.posX = oSourceCanvasRect.width - this.width );
+				( this.x < 0 ) && ( this.x = 0 );
+				( this.x > oSourceCanvasRect.width - this.width ) && ( this.x = oSourceCanvasRect.width - this.width );
 
 			},
 			"render": function(){
 				var ctx = oApplication.context;
 				ctx.fillStyle = this.color;
-				ctx.fillRect( this.posX, this.posY, this.width, this.height );
+				ctx.fillRect( this.x, this.y, this.width, this.height );
 			}
 		};
 
@@ -213,16 +213,16 @@
 			"color": 	PROJECTILECOLOR,
 			"size": 	PROJECTILESIZE,
 			"speed": 	PROJECTILESPEED,
-			"posX": 	oApplication.canvas.width / 2 - PROJECTILESIZE / 2,
-			"posY": 	oApplication.canvas.height - 45,
+			"x": 	oApplication.canvas.width / 2 - PROJECTILESIZE / 2,
+			"y": 	oApplication.canvas.height - 45,
 			"cx": 		0,
 			"cy": 		0,
 			"angle": 	-45,
 			"update": function() {
 				// Movement
 				var newX, newY;
-				this.cx = this.posX + this.size / 2;
-				this.cy = this.posY + this.size / 2;
+				this.cx = this.x + this.size / 2;
+				this.cy = this.y + this.size / 2;
 
 				fCheckCanvasHitzones();
 
@@ -245,19 +245,24 @@
 					newY = - ( 90 + this.angle ) / 90 ;
 				}
 
-				this.posX += newX * this.speed;
-				this.posY += newY * this.speed;
+				this.x += newX * this.speed;
+				this.y += newY * this.speed;
 
 				this.render();
 			},
 			"render": function() {
 				var ctx = oApplication.context;
 				ctx.fillStyle = this.color;
-				//ctx.arc( this.posX + this.size, this.posY + this.size, this.size, 0, Math.PI * 2, true );
-				ctx.fillRect( this.posX, this.posY, this.size, this.size );
+				//ctx.arc( this.x + this.size, this.y + this.size, this.size, 0, Math.PI * 2, true );
+				ctx.fillRect( this.x, this.y, this.size, this.size );
 			}
 		};
 
+
+		/**************************************************************
+			MENU OBJECT.
+			Generates the menus, with the falling bricks.
+		**************************************************************/
 		var oMenu = {
 			"brickAmount": 10,
 			"bricks": [],
@@ -420,29 +425,29 @@
 		var fCheckCanvasHitzones = function() {
 			var side = null;
 			// Hitting left side of canvas
-			if( oProjectile.posX <= 0 ){
+			if( oProjectile.x <= 0 ){
 				side = "left";
 				fRebound( side );
 			}
 			// Hitting top side of canvas
-			if( oProjectile.posY <= 0 ){
+			if( oProjectile.y <= 0 ){
 				side = "top";
 				fRebound( side );
 			}
 			// Hitting right side of canvas
-			if( oProjectile.posX + oProjectile.size >= oSourceCanvasRect.width ){
+			if( oProjectile.x + oProjectile.size >= oSourceCanvasRect.width ){
 				side = "right";
 				fRebound( side );
 			}
 			// Hitting bottom side of canvas
-			if( oProjectile.posY + oProjectile.size > oSourceCanvasRect.height ){
+			if( oProjectile.y + oProjectile.size > oSourceCanvasRect.height ){
 				fGameOver();
 			}
 		}
 
 		var fCheckPlatformHitzones = function() {
 			// Hitting top side of platform
-			if( oProjectile.posY + oProjectile.size >= oPlatform.posY && oProjectile.posX > oPlatform.posX - oProjectile.size && oProjectile.posX + oProjectile.size <= oPlatform.posX + oPlatform.width ){
+			if( oProjectile.y + oProjectile.size >= oPlatform.y && oProjectile.x > oPlatform.x - oProjectile.size && oProjectile.x + oProjectile.size <= oPlatform.x + oPlatform.width ){
 				fRebound( 'bottom' );
 			}
 		}
@@ -461,20 +466,20 @@
 			// Moving the projectile's reference point
 			switch( oProjectile.angle ){
 				case 45:
-					px = oProjectile.posX + oProjectile.size;
-					py = oProjectile.posY;
+					px = oProjectile.x + oProjectile.size;
+					py = oProjectile.y;
 					break;
 				case -45:
-					px = oProjectile.posX;
-					py = oProjectile.posY;
+					px = oProjectile.x;
+					py = oProjectile.y;
 					break;
 				case 135:
-					px = oProjectile.posX + oProjectile.size;
-					py = oProjectile.posY + oProjectile.size;
+					px = oProjectile.x + oProjectile.size;
+					py = oProjectile.y + oProjectile.size;
 					break;
 				case -135:
-					px = oProjectile.posX;
-					py = oProjectile.posY + oProjectile.size;
+					px = oProjectile.x;
+					py = oProjectile.y + oProjectile.size;
 					break;
 			}
 
@@ -547,7 +552,7 @@
 				switch( element.speciality ){
 					case "shorter":
 						oPlatform.width = PLATFORMWIDTH / 2;
-						oPlatform.posX += PLATFORMWIDTH / 4;
+						oPlatform.x += PLATFORMWIDTH / 4;
 						iShorterStartedTime = ( new Date() ).getTime();
 						break;
 					case "faster":
@@ -613,7 +618,7 @@
 			}
 			if( oPlatform.width != PLATFORMWIDTH && iTime - iShorterStartedTime > EFFECTDURATION ){
 				oPlatform.width = PLATFORMWIDTH;
-				oPlatform.posX -= PLATFORMWIDTH / 4;
+				oPlatform.x -= PLATFORMWIDTH / 4;
 			}
 			if( oProjectile.speed < PROJECTILESPEED && ( iTime - iSlowerStartedTime > EFFECTDURATION ) ){
 				console.log( 'Resetting speed to ' + PROJECTILESPEED );
