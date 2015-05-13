@@ -226,7 +226,7 @@
 
 				fCheckCanvasHitzones();
 
-				fCheckPlatformHitzones();
+				//fCheckPlatformHitzones();
 
 				fCheckBricksHitzones();
 
@@ -543,9 +543,66 @@
 					fBrickReact( element );
 
 				}
-					
+
 			} );
-		};
+	
+
+
+			// Platform hitbox
+			x = oPlatform.x - oProjectile.size / 2;
+			y = oPlatform.y - oProjectile.size / 2;
+			xx = x + oPlatform.width + oProjectile.size;
+			yy = y + oPlatform.height + oProjectile.size;
+
+			if( ( oProjectile.cx > x && oProjectile.cx < xx ) && ( oProjectile.cy > y && oProjectile.cy < yy ) ) {
+				// We have contact with the brick
+				if( oProjectile.angle == -45 ){
+					/*
+						If the angle is -45 (top left direction), we can only touch the brick's bottom or right side
+						We calculate the ref point's distance from the bottom and right sides of the brick.
+					*/
+					distX = ( oPlatform.x + oPlatform.width ) - px;
+					distY = ( oPlatform.y + oPlatform.height ) - py;
+					if( distX >= distY ){
+						// We touched the brick's bottom.
+						fRebound( 'top' );
+					} else {
+						// alert('On entre par la droite');
+						fRebound('left');
+					}
+				} else if( oProjectile.angle == 45 ){
+					distX = px - oPlatform.x;
+					distY = ( oPlatform.y + oPlatform.height ) - py;
+					if( distX >= distY ){
+						// alert('On entre par le bas');
+						fRebound( 'top' );
+					} else {
+						// alert('On entre par la gauche');
+						fRebound('right');
+					}
+				} else if( oProjectile.angle == 135 ){
+					distX = px - oPlatform.x;
+					distY = py - oPlatform.y;
+					if( distX >= distY ){
+						// alert('On entre par le haut');
+						fRebound( 'bottom' );
+					} else {
+						// alert('On entre par la gauche');
+						fRebound('right');
+					}
+				} else if( oProjectile.angle == -135 ){
+					distX = ( oPlatform.x + oPlatform.width ) - px;
+					distY = py - oPlatform.y;
+					if( distX >= distY ){
+						// alert('On entre par le haut');
+						fRebound( 'bottom' );
+					} else {
+						// alert('On entre par la droite');
+						fRebound('left');				
+					}
+				}
+			}
+		}
 
 		var fBrickReact = function( element ){
 			if( element.hits == element.maxHits ){
@@ -578,7 +635,7 @@
 				iScore++;
 				aBricks.splice(aBricks.indexOf(element), 1);
 			}
-		}
+		};
 
 		var fRebound = function( side ){
 
