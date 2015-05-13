@@ -4,7 +4,10 @@
 
 	window.Breakout = function( oApplication ){
 
-		// Constants
+		/**************************************************************
+			CONSTANTS.
+			BEWARE! modifying these can break the game's appearance.
+		**************************************************************/
 		var EFFECTDURATION		= 3000,
 			BROWN				= "#3d3234",
 			LIGHTBROWN			= "#6b5d60",
@@ -12,9 +15,7 @@
 			BEIGE				= "#e2e6d2",
 			WHITE 				= "#ffffff",
 			RED 				= "#ca4645";
-
-
-		// (Bricks)
+		// Bricks
 		var BRICKWIDTH 			= 36,
 			BRICKHEIGHT 		= 12,
 			BRICKXMARGIN 		= 10,
@@ -24,25 +25,23 @@
 			WIDENERCOLOR		= BEIGE,
 			FASTERCOLOR			= BEIGE,
 			SLOWERCOLOR			= GREEN;
-
-		// (Platform)
+		// Platform
 		var PLATFORMWIDTH 		= 100,
 			PLATFORMHEIGHT 		= 10,
 			PLATFORMCOLOR		= BEIGE,
 			PLATFORMSPEED 		= 30,
 			PLATFORMMAXSPEED 	= 40,
 			PLATFORMMINSPEED 	= 30;
-
-		// (Projectile)
+		// Projectile
 		var PROJECTILESIZE		= 15,
 			PROJECTILEMAXSIZE	= 20,
 			PROJECTILECOLOR		= GREEN,
-			PROJECTILESPEED 	= 5,
+			PROJECTILESPEED 	= 1,
 			PROJECTILEMAXSPEED 	= 9,
 			PROJECTILEMINSPEED	= 3;
 
 
-		// Global params
+		// Global variables
 		var iAnimationRequestId = 0,
 			oSpriteSheet = null,
 			sSpriteSheetSrc = "./img/sprite.png",
@@ -55,7 +54,11 @@
 			iSlowerStartedTime = null,
 			iFasterStartedTime = null;
 
-		// Background
+
+		/**************************************************************
+			BACKGROUND OBJECT.
+			Provides a simple bg for the game and displays the score.
+		**************************************************************/
 		var oBackground = {
 			"color": BROWN,
 			"render": function() {
@@ -70,7 +73,11 @@
 			}
 		};
 
-		// Bricks
+
+		/**************************************************************
+			BRICKS.
+			Used in game and in the menu.
+		**************************************************************/
 		var Brick = function( iX, iY, sSpeciality ) {
 			this.frame = {
 				sx: 0,
@@ -78,30 +85,34 @@
 				sw: BRICKWIDTH,
 				sh: BRICKHEIGHT
 			}
-			this.width = 		BRICKWIDTH;
-			this.height = 		BRICKHEIGHT;
-			this.x = 			iX;
-			this.y = 			iY;
-			this.cx = 			iX + BRICKWIDTH / 2;
-			this.cy = 			iY + BRICKHEIGHT / 2;
-			this.color = 		DEFAULTBRICKCOLOR;
-			this.hits = 		0;
-			this.maxHits = 		1;
-			this.speciality = 	sSpeciality;
-			this.fallingSpeed = Math.random() + 0.5;
-			if( sSpeciality == "harder" ){
-				this.color = HARDERCOLOR;
-				this.maxHits = 3;
-				this.frame.sy = 50;
-			} else if( sSpeciality == "shorter" ){
-				this.color = WIDENERCOLOR;
-			} else if( sSpeciality == "faster" ){
-				this.color = FASTERCOLOR;
-				this.frame.sy = 92;
-			} else if( sSpeciality == "slower" ){
-				this.color = SLOWERCOLOR;
-				this.frame.sy = 80;
+			this.width 			= BRICKWIDTH;
+			this.height 		= BRICKHEIGHT;
+			this.x 				= iX;
+			this.y 				= iY;
+			this.color 			= DEFAULTBRICKCOLOR;
+			this.hits 			= 0;
+			this.maxHits 		= 1;
+			this.speciality 	= sSpeciality;
+			this.fallingSpeed 	= Math.random() + 0.5;
+			switch( sSpeciality ){
+				case "harder":
+					this.color = HARDERCOLOR;
+					this.maxHits = 3;
+					this.frame.sy = 50;
+					break;
+				case "shorter":
+					this.color = WIDENERCOLOR;
+					break;
+				case "faster":
+					this.color = FASTERCOLOR;
+					this.frame.sy = 92;
+					break;
+				case "slower":
+					this.color = SLOWERCOLOR;
+					this.frame.sy = 80;
+					break;
 			}
+
 		};
 
 		Brick.prototype.render = function() {
@@ -131,6 +142,11 @@
 			this.render();
 		};
 
+
+		/**************************************************************
+			PLATFORM OBJECT.
+			Controlled by the user to keep the projectile from falling.
+		**************************************************************/
 		var oPlatform = {
 			"width": PLATFORMWIDTH,
 			"height": PLATFORMHEIGHT,
@@ -147,7 +163,7 @@
 				} else if( oEvent.keyCode == 39 ) {
 					// Right key
 					this.posX+=this.speed;
-					( this.posX > oSourceCanvasRect.width - this.width ) && ( this.posX = oSourceCanvasRect.width - this.width  );
+					( this.posX > oSourceCanvasRect.width - this.width ) && ( this.posX = oSourceCanvasRect.width - this.width );
 				} else if ( oEvent.keyCode == 40 ){
 					oProjectile.speed -= 5;
 				} else if ( oEvent.keyCode == 38 ){
@@ -161,6 +177,11 @@
 			}
 		};
 
+
+		/**************************************************************
+			PROJECTILE OBJECT.
+			Breaks the bricks. And your face too. Be careful.
+		**************************************************************/
 		var oProjectile = {
 			"color": 	PROJECTILECOLOR,
 			"size": 	PROJECTILESIZE,
@@ -172,29 +193,11 @@
 			"angle": 	-45,
 			"update": function() {
 				// Movement
-				var newX, newY, side;
+				var newX, newY;
 				this.cx = this.posX + this.size / 2;
 				this.cy = this.posY + this.size / 2;
 
-				// Hitting left side of canvas
-				if( this.posX <= 0 ){
-					side = "left";
-					fRebound( side );
-				}
-				// Hitting top side of canvas
-				if( this.posY <= 0 ){
-					side = "top";
-					fRebound( side );
-				}
-				// Hitting right side of canvas
-				if( this.posX + this.size >= oSourceCanvasRect.width ){
-					side = "right";
-					fRebound( side );
-				}
-				// Hitting bottom side of canvas
-				if( this.posY + this.size > oSourceCanvasRect.height ){
-					fGameOver();
-				}
+				fCheckCanvasHitzones();
 
 				fCheckPlatformHitzones();
 
@@ -386,6 +389,29 @@
 			console.log("Done! Ready to start...");
 		};
 
+		var fCheckCanvasHitzones = function() {
+			var side = null;
+			// Hitting left side of canvas
+			if( oProjectile.posX <= 0 ){
+				side = "left";
+				fRebound( side );
+			}
+			// Hitting top side of canvas
+			if( oProjectile.posY <= 0 ){
+				side = "top";
+				fRebound( side );
+			}
+			// Hitting right side of canvas
+			if( oProjectile.posX + oProjectile.size >= oSourceCanvasRect.width ){
+				side = "right";
+				fRebound( side );
+			}
+			// Hitting bottom side of canvas
+			if( oProjectile.posY + oProjectile.size > oSourceCanvasRect.height ){
+				fGameOver();
+			}
+		}
+
 		var fCheckPlatformHitzones = function() {
 			// Hitting top side of platform
 			if( oProjectile.posY + oProjectile.size >= oPlatform.posY && oProjectile.posX > oPlatform.posX - oProjectile.size && oProjectile.posX + oProjectile.size <= oPlatform.posX + oPlatform.width ){
@@ -434,7 +460,6 @@
 
 				if( ( oProjectile.cx > x && oProjectile.cx < xx ) && ( oProjectile.cy > y && oProjectile.cy < yy ) ) {
 					// We have contact with the brick
-
 					if( oProjectile.angle == -45 ){
 						/*
 							If the angle is -45 (top left direction), we can only touch the brick's bottom or right side
@@ -442,7 +467,6 @@
 						*/
 						distX = ( element.x + element.width ) - px;
 						distY = ( element.y + element.height ) - py;
-
 						if( distX >= distY ){
 							// We touched the brick's bottom.
 							fRebound( 'top' );
@@ -450,12 +474,9 @@
 							// alert('On entre par la droite');
 							fRebound('left');
 						}
-
 					} else if( oProjectile.angle == 45 ){
-
 						distX = px - element.x;
 						distY = ( element.y + element.height ) - py;
-
 						if( distX >= distY ){
 							// alert('On entre par le bas');
 							fRebound( 'top' );
@@ -463,12 +484,9 @@
 							// alert('On entre par la gauche');
 							fRebound('right');
 						}
-
 					} else if( oProjectile.angle == 135 ){
-
 						distX = px - element.x;
 						distY = py - element.y;
-
 						if( distX >= distY ){
 							// alert('On entre par le haut');
 							fRebound( 'bottom' );
@@ -476,21 +494,16 @@
 							// alert('On entre par la gauche');
 							fRebound('right');
 						}
-
 					} else if( oProjectile.angle == -135 ){
-
 						distX = ( element.x + element.width ) - px;
 						distY = py - element.y;
-
 						if( distX >= distY ){
 							// alert('On entre par le haut');
 							fRebound( 'bottom' );
 						} else {
 							// alert('On entre par la droite');
-							fRebound('left');
-							
+							fRebound('left');				
 						}
-
 					}
 					element.hits++;
 
@@ -523,7 +536,6 @@
 					case "bigger":
 						oProjectile.size += 25;
 						iBiggerStartedTime = ( new Date() ).getTime();
-						console.log( iBiggerStartedTime );
 						( oProjectile.size > PROJECTILEMAXSIZE ) && ( oProjectile.size = PROJECTILEMAXSIZE );
 						break;
 					default:
@@ -557,10 +569,8 @@
 		};
 
 		var fShowStartscreen = function() {
-
 			// Initialise menu
 			oMenu.init();
-			
 		};
 
 		// Called at each animation frame request
@@ -576,6 +586,10 @@
 				oPlatform.width = PLATFORMWIDTH;
 			}
 			if( oProjectile.speed != PROJECTILESPEED && ( iTime - iSlowerStartedTime > EFFECTDURATION ) ){
+				console.log( 'Resetting speed to ' + PROJECTILESPEED );
+				oProjectile.speed = PROJECTILESPEED;
+			}
+			if( oProjectile.speed != PROJECTILESPEED && ( iTime - iFasterStartedTime > EFFECTDURATION ) ){
 				console.log( 'Resetting speed to ' + PROJECTILESPEED );
 				oProjectile.speed = PROJECTILESPEED;
 			}
