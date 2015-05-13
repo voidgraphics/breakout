@@ -536,13 +536,13 @@
 
 			// Verify effects duration
 			iTime = ( new Date() ).getTime();
-			if( iTime - iBiggerStartedTime > EFFECTDURATION ){
+			if( oProjectile.size != PROJECTILESIZE && iTime - iBiggerStartedTime > EFFECTDURATION ){
 				oProjectile.size = PROJECTILESIZE;
 			}
-			if( iTime - iShorterStartedTime > EFFECTDURATION ){
+			if( oPlatform.width != PLATFORMWIDTH && iTime - iShorterStartedTime > EFFECTDURATION ){
 				oPlatform.width = PLATFORMWIDTH;
 			}
-			if( iTime - iSlowerStartedTime > EFFECTDURATION || iTime - iFasterStartedTime > EFFECTDURATION ){
+			if( oProjectile.speed != PROJECTILESPEED && ( iTime - iSlowerStartedTime > EFFECTDURATION ) ){
 				console.log( 'Resetting speed to ' + PROJECTILESPEED );
 				oProjectile.speed = PROJECTILESPEED;
 			}
