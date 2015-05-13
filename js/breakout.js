@@ -88,21 +88,19 @@
 			this.hits = 		0;
 			this.maxHits = 		1;
 			this.speciality = 	sSpeciality;
-			this.fallingSpeed = 1.3;
+			this.fallingSpeed = Math.random() + 0.5;
 			if( sSpeciality == "harder" ){
 				this.color = HARDERCOLOR;
 				this.maxHits = 3;
 				this.frame.sy = 50;
-				this.fallingSpeed = 2;
 			} else if( sSpeciality == "shorter" ){
 				this.color = WIDENERCOLOR;
 			} else if( sSpeciality == "faster" ){
 				this.color = FASTERCOLOR;
-				this.fallingSpeed = 1.7;
+				this.frame.sy = 92;
 			} else if( sSpeciality == "slower" ){
 				this.color = SLOWERCOLOR;
 				this.frame.sy = 80;
-				this.fallingSpeed = 0.5;
 			}
 		};
 
@@ -242,11 +240,8 @@
 			"generateBricks": function() {
 				var x, y, random, speciality, oBrick;
 				for ( var i = 0; i <= this.brickAmount; i++ ){
-					random = ~~( Math.random() * 4 );
+					random = ~~( Math.random() * 6 );
 					switch( random ){
-						case 0:
-							speciality = "none";
-							break;
 						case 1:
 							speciality = "harder";
 							break;
@@ -255,6 +250,9 @@
 							break;
 						case 3:
 							speciality = "faster";
+							break;
+						default:
+							speciality = "none";
 							break;
 					}
 					x = ~~( Math.random() * oApplication.width );
@@ -294,16 +292,16 @@
 
 				// Text
 				ctx.fillStyle = WHITE;
-				ctx.font = "700 16px 'Lato Black'";
+				ctx.font = "16px 'Lato Black'";
 				ctx.textAlign = "center";
 				text = "BREAKOUT".split("").join(String.fromCharCode(8194));
 				ctx.fillText( text, oApplication.width / 2, oApplication.height / 2 - 15 )
 				ctx.fillStyle = BEIGE;
 				text = "CLICK TO START".split("").join(String.fromCharCode(8194));
 				ctx.fillText(text, oApplication.width / 2, oApplication.height / 2 + 20);
-				ctx.font = "500 10px 'Lato Black'";
+				ctx.font = "10px 'Lato Black'";
 				ctx.fillStyle = RED;
-				text = "CODE BY ADRIEN LELOUP".split("").join(String.fromCharCode(8194));
+				text = "CODE BY ADRIEN LELOUP".split("").join(String.fromCharCode(8196));
 				ctx.fillText( text, oApplication.width / 2, oApplication.height / 1.2);
 
 			},
