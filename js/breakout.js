@@ -226,9 +226,11 @@
 
 				fCheckCanvasHitzones();
 
-				//fCheckPlatformHitzones();
+				fCheckHitzones( oPlatform, false );
 
-				fCheckBricksHitzones();
+				aBricks.forEach( function( brick ){
+					fCheckHitzones( brick, true );
+				} );
 
 				// Calculate trajectory based on direction angle (ranging from -180 to 180 degrees)
 				if ( this.angle >= 90){
@@ -443,16 +445,10 @@
 			if( oProjectile.y + oProjectile.size > oSourceCanvasRect.height ){
 				fGameOver();
 			}
-		}
+		};
 
-		var fCheckPlatformHitzones = function() {
-			// Hitting top side of platform
-			if( oProjectile.y + oProjectile.size >= oPlatform.y && oProjectile.x > oPlatform.x - oProjectile.size && oProjectile.x + oProjectile.size <= oPlatform.x + oPlatform.width ){
-				fRebound( 'bottom' );
-			}
-		}
 
-		var fCheckBricksHitzones = function() {
+		var fCheckHitzones = function( element, isBrick ) {
 			/*
 				x and y represent the top left of the brick's hitzone.
 				xx and yy represent the bottom right of the brick's hitzone.
@@ -483,9 +479,7 @@
 					break;
 			}
 
-			aBricks.forEach( function( element ){
-
-				// Brick hitbox
+				// hitbox
 				x = element.x - oProjectile.size / 2;
 				y = element.y - oProjectile.size / 2;
 				xx = x + element.width + oProjectile.size;
@@ -538,71 +532,15 @@
 							fRebound('left');				
 						}
 					}
-					element.hits++;
 
-					fBrickReact( element );
+					if( isBrick ){
+						element.hits++;
+						fBrickReact( element );
+					}
+
 
 				}
-
-			} );
-	
-
-
-			// Platform hitbox
-			x = oPlatform.x - oProjectile.size / 2;
-			y = oPlatform.y - oProjectile.size / 2;
-			xx = x + oPlatform.width + oProjectile.size;
-			yy = y + oPlatform.height + oProjectile.size;
-
-			if( ( oProjectile.cx > x && oProjectile.cx < xx ) && ( oProjectile.cy > y && oProjectile.cy < yy ) ) {
-				// We have contact with the brick
-				if( oProjectile.angle == -45 ){
-					/*
-						If the angle is -45 (top left direction), we can only touch the brick's bottom or right side
-						We calculate the ref point's distance from the bottom and right sides of the brick.
-					*/
-					distX = ( oPlatform.x + oPlatform.width ) - px;
-					distY = ( oPlatform.y + oPlatform.height ) - py;
-					if( distX >= distY ){
-						// We touched the brick's bottom.
-						fRebound( 'top' );
-					} else {
-						// alert('On entre par la droite');
-						fRebound('left');
-					}
-				} else if( oProjectile.angle == 45 ){
-					distX = px - oPlatform.x;
-					distY = ( oPlatform.y + oPlatform.height ) - py;
-					if( distX >= distY ){
-						// alert('On entre par le bas');
-						fRebound( 'top' );
-					} else {
-						// alert('On entre par la gauche');
-						fRebound('right');
-					}
-				} else if( oProjectile.angle == 135 ){
-					distX = px - oPlatform.x;
-					distY = py - oPlatform.y;
-					if( distX >= distY ){
-						// alert('On entre par le haut');
-						fRebound( 'bottom' );
-					} else {
-						// alert('On entre par la gauche');
-						fRebound('right');
-					}
-				} else if( oProjectile.angle == -135 ){
-					distX = ( oPlatform.x + oPlatform.width ) - px;
-					distY = py - oPlatform.y;
-					if( distX >= distY ){
-						// alert('On entre par le haut');
-						fRebound( 'bottom' );
-					} else {
-						// alert('On entre par la droite');
-						fRebound('left');				
-					}
-				}
-			}
-		}
+		};
 
 		var fBrickReact = function( element ){
 			if( element.hits == element.maxHits ){
