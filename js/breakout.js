@@ -43,8 +43,10 @@
 
 		// Global variables
 		var iAnimationRequestId = 0,
+			iMenuAnimationRequestId = 0,
 			oSpriteSheet = null,
 			respawnBricks = true,
+			hasLost = false,
 			sSpriteSheetSrc = "./img/sprite.png",
 			iScore = 0,
 			aBricks = [],
@@ -307,11 +309,12 @@
 				}
 			},
 			"animate": function() {
-				iAnimationRequestId = window.requestAnimationFrame( oMenu.animate );
+				iMenuAnimationRequestId = window.requestAnimationFrame( oMenu.animate );
 				oMenu.update();
 				oMenu.render();
 			},
 			"render": function() {
+
 				var ctx = oApplication.context, text;
 				ctx.clearRect( 0, 0, oApplication.width, oApplication.height );
 
@@ -337,18 +340,34 @@
 				} );
 
 				// Text
-				ctx.fillStyle = WHITE;
-				ctx.font = "16px 'Lato Black'";
-				ctx.textAlign = "center";
-				text = "BREAKOUT".split("").join(String.fromCharCode(8194));
-				ctx.fillText( text, oApplication.width / 2, oApplication.height / 2 - 15 )
-				ctx.fillStyle = BEIGE;
-				text = "CLICK TO START".split("").join(String.fromCharCode(8194));
-				ctx.fillText(text, oApplication.width / 2, oApplication.height / 2 + 20);
-				ctx.font = "10px 'Lato Black'";
-				ctx.fillStyle = RED;
-				text = "CODE BY ADRIEN LELOUP".split("").join(String.fromCharCode(8196));
-				ctx.fillText( text, oApplication.width / 2, oApplication.height / 1.2);
+				if( !hasLost ){
+					ctx.fillStyle = WHITE;
+					ctx.font = "16px 'Lato Black'";
+					ctx.textAlign = "center";
+					text = "BREAKOUT".split("").join(String.fromCharCode(8194));
+					ctx.fillText( text, oApplication.width / 2, oApplication.height / 2 - 15 )
+					ctx.fillStyle = BEIGE;
+					text = "CLICK TO START".split("").join(String.fromCharCode(8194));
+					ctx.fillText(text, oApplication.width / 2, oApplication.height / 2 + 20);
+					ctx.font = "10px 'Lato Black'";
+					ctx.fillStyle = RED;
+					text = "CODE BY ADRIEN LELOUP".split("").join(String.fromCharCode(8196));
+					ctx.fillText( text, oApplication.width / 2, oApplication.height / 1.2);
+				} else {
+					ctx.fillStyle = WHITE;
+					ctx.font = "16px 'Lato Black'";
+					ctx.textAlign = "center";
+					text = "GAMEOVER".split("").join(String.fromCharCode(8194));
+					ctx.fillText( text, oApplication.width / 2, oApplication.height / 2 - 15 )
+					ctx.fillStyle = BEIGE;
+					ctx.font = "12PX Lato";
+					text = ("YOU BROKE " + iScore + " BRICKS. CLICK TO PLAY AGAIN." ).split("").join(String.fromCharCode(8194));
+					ctx.fillText(text, oApplication.width / 2, oApplication.height / 2 + 20);
+					ctx.font = "10px 'Lato Black'";
+					ctx.fillStyle = RED;
+					text = "CODE BY ADRIEN LELOUP".split("").join(String.fromCharCode(8196));
+					ctx.fillText( text, oApplication.width / 2, oApplication.height / 1.2);
+				}
 
 			},
 			"update": function() {
@@ -378,7 +397,8 @@
 
 		// start game
 		var start = function() {
-			window.cancelAnimationFrame( iAnimationRequestId );
+			window.cancelAnimationFrame( iMenuAnimationRequestId );
+			oApplication.context.clearRect( 0, 0, oApplication.width, oApplication.height );
 			console.log( "Starting game!" );
 			// listen to arrow keys to trigger platform movement
 			window.addEventListener( "keydown", oPlatform.update.bind( oPlatform ) );
@@ -614,56 +634,71 @@
 
 		// Called at each animation frame request
 		var fAnimationLoop = function() {
-			iAnimationRequestId = window.requestAnimationFrame( fAnimationLoop );
+			if( !hasLost ){
+				iAnimationRequestId = window.requestAnimationFrame( fAnimationLoop );
 
-			// Verify effects duration
-			iTime = ( new Date() ).getTime();
-			if( oProjectile.size != PROJECTILESIZE && iTime - iBiggerStartedTime > EFFECTDURATION ){
-				oProjectile.size = PROJECTILESIZE;
-			}
-			if( oPlatform.width != PLATFORMWIDTH && iTime - iShorterStartedTime > EFFECTDURATION ){
-				oPlatform.width = PLATFORMWIDTH;
-				oPlatform.x -= PLATFORMWIDTH / 4;
-			}
-			if( oProjectile.speed < PROJECTILESPEED && ( iTime - iSlowerStartedTime > EFFECTDURATION ) ){
-				console.log( 'Resetting speed to ' + PROJECTILESPEED );
-				oProjectile.speed = PROJECTILESPEED;
-			}
-			if( oProjectile.speed > PROJECTILESPEED && ( iTime - iFasterStartedTime > EFFECTDURATION ) ){
-				console.log( 'Resetting speed to ' + PROJECTILESPEED );
-				oProjectile.speed = PROJECTILESPEED;
-			}
-			// clear canvas
-			oApplication.context.clearRect( 0, 0, oApplication.width, oApplication.height );
-			// draw background
-			oBackground.render();
-			// update & draw bricks
-			for( var i=0; i < aBricks.length; i+=2 ){
-				aBricks[ i ].update();
-			}
+				// Verify effects duration
+				iTime = ( new Date() ).getTime();
+				if( oProjectile.size != PROJECTILESIZE && iTime - iBiggerStartedTime > EFFECTDURATION ){
+					oProjectile.size = PROJECTILESIZE;
+				}
+				if( oPlatform.width != PLATFORMWIDTH && iTime - iShorterStartedTime > EFFECTDURATION ){
+					oPlatform.width = PLATFORMWIDTH;
+					oPlatform.x -= PLATFORMWIDTH / 4;
+				}
+				if( oProjectile.speed < PROJECTILESPEED && ( iTime - iSlowerStartedTime > EFFECTDURATION ) ){
+					console.log( 'Resetting speed to ' + PROJECTILESPEED );
+					oProjectile.speed = PROJECTILESPEED;
+				}
+				if( oProjectile.speed > PROJECTILESPEED && ( iTime - iFasterStartedTime > EFFECTDURATION ) ){
+					console.log( 'Resetting speed to ' + PROJECTILESPEED );
+					oProjectile.speed = PROJECTILESPEED;
+				}
+				// clear canvas
+				oApplication.context.clearRect( 0, 0, oApplication.width, oApplication.height );
+				// draw background
+				oBackground.render();
+				// update & draw bricks
+				for( var i=0; i < aBricks.length; i+=2 ){
+					aBricks[ i ].update();
+				}
 
-			if( aBricks.length == 0 ){
-				fGameWon();
-			}
+				if( aBricks.length == 0 ){
+					fGameWon();
+				}
 
-			// render platform
-			oPlatform.render();
-			// update projectile
-			oProjectile.update();
+				// render platform
+				oPlatform.render();
+				// update projectile
+				oProjectile.update();
+			}
 		};
 
 		// Game over
 		var fGameOver = function() {
+			console.log("You lost!")
 			respawnBricks = false;
+			hasLost = true;
 			oMenu.bricks = aBricks;
 			oMenu.animate();
-			//window.cancelAnimationFrame( iAnimationRequestId );
+			window.cancelAnimationFrame( iAnimationRequestId );
+			oApplication.canvas.addEventListener( "click", function(){
+				oProjectile.x = oApplication.canvas.width / 2 - PROJECTILESIZE / 2;
+				oProjectile.y = oApplication.canvas.height - 45;
+				oProjectile.angle = -45;
+				iScore = 0;
+				hasLost = false;
+				aBricks = [];
+				fGenerateBricks();
+				start();
+			} );
 			//window.alert( "Perdu !" );
 			// Refresh to restart
 			//window.location.reload( true );
 		};
 
 		var fGameWon = function() {
+			console.log("You won!")
 			window.cancelAnimationFrame( iAnimationRequestId );
 			window.alert( "Gagné !" );
 			// Refresh to restart
