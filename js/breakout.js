@@ -44,6 +44,7 @@
 		// Global variables
 		var iAnimationRequestId = 0,
 			oSpriteSheet = null,
+			respawnBricks = true,
 			sSpriteSheetSrc = "./img/sprite.png",
 			iScore = 0,
 			aBricks = [],
@@ -170,6 +171,14 @@
 			this.render();
 		};
 
+		Brick.prototype.fall = function() {
+			oApplication.context.clearRect( 0, 0, oApplication.width, oApplication.height );
+			aBricks.forEach( function( brick ) {
+				brick.y += 5;
+			} );
+			this.render();
+		}
+
 
 		/**************************************************************
 			PLATFORM OBJECT.
@@ -271,7 +280,7 @@
 			"init": function(){
 				this.generateBricks();
 				this.render();
-				this.animate();
+				this.animate( true );
 				console.log('Initialising menu');
 			},
 			"generateBricks": function() {
@@ -345,9 +354,11 @@
 			"update": function() {
 				oMenu.bricks.forEach( function( element ){
 					element.y += element.fallingSpeed;
-					if( element.y > oApplication.height ){
-						element.x = ~~( Math.random() * oApplication.width );
-						element.y = - element.height;
+					if( respawnBricks ){
+						if( element.y > oApplication.height ){
+							element.x = ~~( Math.random() * oApplication.width );
+							element.y = - element.height;
+						}
 					}
 				} );
 			}
@@ -381,9 +392,9 @@
 				iPaddingY = 30, 
 				iXOffset = iPaddingX, 
 				iYOffset = iPaddingY, 
-				topBrickCount = 1, 
+				topBrickCount = 8, 
 				lineNumber = 1, 
-				maxLines = 1,
+				maxLines = 8,
 				speciality, 
 				k = 0;
 			console.log( "Generating bricks:" );
@@ -643,10 +654,13 @@
 
 		// Game over
 		var fGameOver = function() {
-			window.cancelAnimationFrame( iAnimationRequestId );
-			window.alert( "Perdu !" );
+			respawnBricks = false;
+			oMenu.bricks = aBricks;
+			oMenu.animate();
+			//window.cancelAnimationFrame( iAnimationRequestId );
+			//window.alert( "Perdu !" );
 			// Refresh to restart
-			window.location.reload( true );
+			//window.location.reload( true );
 		};
 
 		var fGameWon = function() {
