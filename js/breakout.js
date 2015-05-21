@@ -381,9 +381,9 @@
 				iPaddingY = 30, 
 				iXOffset = iPaddingX, 
 				iYOffset = iPaddingY, 
-				topBrickCount = 8, 
+				topBrickCount = 1, 
 				lineNumber = 1, 
-				maxLines = 8,
+				maxLines = 1,
 				speciality, 
 				k = 0;
 			console.log( "Generating bricks:" );
@@ -446,7 +446,6 @@
 				fGameOver();
 			}
 		};
-
 
 		var fCheckHitzones = function( element, isBrick ) {
 			/*
@@ -631,6 +630,11 @@
 			for( var i=0; i < aBricks.length; i+=2 ){
 				aBricks[ i ].update();
 			}
+
+			if( aBricks.length == 0 ){
+				fGameWon();
+			}
+
 			// render platform
 			oPlatform.render();
 			// update projectile
@@ -644,6 +648,13 @@
 			// Refresh to restart
 			window.location.reload( true );
 		};
+
+		var fGameWon = function() {
+			window.cancelAnimationFrame( iAnimationRequestId );
+			window.alert( "Gagné !" );
+			// Refresh to restart
+			window.location.reload( true );
+		}
 
 		oSpriteSheet = new Image();
 		oSpriteSheet.addEventListener( "load", init );
