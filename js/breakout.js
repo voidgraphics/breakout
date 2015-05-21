@@ -682,28 +682,31 @@
 			oMenu.bricks = aBricks;
 			oMenu.animate();
 			window.cancelAnimationFrame( iAnimationRequestId );
-			oApplication.canvas.addEventListener( "click", function(){
-				oProjectile.x = oApplication.canvas.width / 2 - PROJECTILESIZE / 2;
-				oProjectile.y = oApplication.canvas.height - 45;
-				oProjectile.angle = -45;
-				iScore = 0;
-				hasLost = false;
-				aBricks = [];
-				fGenerateBricks();
-				start();
-			} );
+			oApplication.canvas.addEventListener( "click", fReset );
 			//window.alert( "Perdu !" );
 			// Refresh to restart
 			//window.location.reload( true );
 		};
 
 		var fGameWon = function() {
-			console.log("You won!")
+			console.log("You won!");
 			window.cancelAnimationFrame( iAnimationRequestId );
 			window.alert( "Gagné !" );
 			// Refresh to restart
 			window.location.reload( true );
-		}
+		};
+
+		var fReset = function() {
+			oProjectile.x = oApplication.canvas.width / 2 - PROJECTILESIZE / 2;
+			oProjectile.y = oApplication.canvas.height - 45;
+			oProjectile.angle = -45;
+			iScore = 0;
+			hasLost = false;
+			aBricks = [];
+			fGenerateBricks();
+			start();
+			oApplication.canvas.removeEventListener( "click", fReset );
+		};
 
 		oSpriteSheet = new Image();
 		oSpriteSheet.addEventListener( "load", init );
