@@ -48,6 +48,7 @@
 			respawnBricks = true,
 			hasLost = false,
 			hasWon = false,
+			speedModifier = 1,
 			sSpriteSheetSrc = "./img/sprite.png",
 			iScore = 0,
 			aBricks = [],
@@ -171,14 +172,6 @@
 		};
 
 		Brick.prototype.update = function() {
-			this.render();
-		};
-
-		Brick.prototype.fall = function() {
-			oApplication.context.clearRect( 0, 0, oApplication.width, oApplication.height );
-			aBricks.forEach( function( brick ) {
-				brick.y += 5;
-			} );
 			this.render();
 		};
 
@@ -388,7 +381,7 @@
 			},
 			"update": function() {
 				oMenu.bricks.forEach( function( element ){
-					element.y += element.fallingSpeed;
+					element.y += element.fallingSpeed * speedModifier;
 					if( respawnBricks ){
 						if( element.y > oApplication.height ){
 							element.x = ~~( Math.random() * oApplication.width );
@@ -692,6 +685,7 @@
 
 		// Game over
 		var fGameOver = function() {
+			speedModifier = 5;
 			console.log( "You lost! Score: " + iScore );
 			respawnBricks = false;
 			hasLost = true;
@@ -702,6 +696,7 @@
 		};
 
 		var fGameWon = function() {
+			speedModifier = 1;
 			hasWon = true;
 			console.log( "You won!" );
 			oMenu.init();
