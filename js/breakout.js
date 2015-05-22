@@ -47,6 +47,7 @@
 			oSpriteSheet = null,
 			respawnBricks = true,
 			hasLost = false,
+			hasWon = false,
 			sSpriteSheetSrc = "./img/sprite.png",
 			iScore = 0,
 			aBricks = [],
@@ -280,6 +281,7 @@
 			"brickAmount": 10,
 			"bricks": [],
 			"init": function(){
+				this.bricks = [];
 				this.generateBricks();
 				this.render();
 				this.animate( true );
@@ -340,14 +342,29 @@
 				} );
 
 				// Text
-				if( !hasLost ){
+				if( hasWon ){
 					ctx.fillStyle = WHITE;
 					ctx.font = "16px 'Lato Black'";
 					ctx.textAlign = "center";
-					text = "BREAKOUT".split("").join(String.fromCharCode(8194));
+					text = "YOU WON!".split("").join(String.fromCharCode(8194));
 					ctx.fillText( text, oApplication.width / 2, oApplication.height / 2 - 15 )
 					ctx.fillStyle = BEIGE;
-					text = "CLICK TO START".split("").join(String.fromCharCode(8194));
+					ctx.font = "12PX Lato";
+					text = "CONGRATULATIONS. CLICK TO RESTART.".split("").join(String.fromCharCode(8194));
+					ctx.fillText(text, oApplication.width / 2, oApplication.height / 2 + 20);
+					ctx.font = "10px 'Lato Black'";
+					ctx.fillStyle = RED;
+					text = "CODE BY ADRIEN LELOUP".split("").join(String.fromCharCode(8196));
+					ctx.fillText( text, oApplication.width / 2, oApplication.height / 1.2);
+				} else if( hasLost ){
+					ctx.fillStyle = WHITE;
+					ctx.font = "16px 'Lato Black'";
+					ctx.textAlign = "center";
+					text = "GAMEOVER".split("").join(String.fromCharCode(8194));
+					ctx.fillText( text, oApplication.width / 2, oApplication.height / 2 - 15 )
+					ctx.fillStyle = BEIGE;
+					ctx.font = "12PX Lato";
+					text = ("YOU BROKE " + iScore + " BRICKS. CLICK TO PLAY AGAIN." ).split("").join(String.fromCharCode(8194));
 					ctx.fillText(text, oApplication.width / 2, oApplication.height / 2 + 20);
 					ctx.font = "10px 'Lato Black'";
 					ctx.fillStyle = RED;
@@ -357,11 +374,10 @@
 					ctx.fillStyle = WHITE;
 					ctx.font = "16px 'Lato Black'";
 					ctx.textAlign = "center";
-					text = "GAMEOVER".split("").join(String.fromCharCode(8194));
+					text = "BREAKOUT".split("").join(String.fromCharCode(8194));
 					ctx.fillText( text, oApplication.width / 2, oApplication.height / 2 - 15 )
 					ctx.fillStyle = BEIGE;
-					ctx.font = "12PX Lato";
-					text = ("YOU BROKE " + iScore + " BRICKS. CLICK TO PLAY AGAIN." ).split("").join(String.fromCharCode(8194));
+					text = "CLICK TO START".split("").join(String.fromCharCode(8194));
 					ctx.fillText(text, oApplication.width / 2, oApplication.height / 2 + 20);
 					ctx.font = "10px 'Lato Black'";
 					ctx.fillStyle = RED;
@@ -412,9 +428,9 @@
 				iPaddingY = 30, 
 				iXOffset = iPaddingX, 
 				iYOffset = iPaddingY, 
-				topBrickCount = 8, 
+				topBrickCount = 1, 
 				lineNumber = 1, 
-				maxLines = 8,
+				maxLines = 1,
 				speciality, 
 				k = 0;
 			console.log( "Generating bricks:" );
@@ -676,30 +692,29 @@
 
 		// Game over
 		var fGameOver = function() {
-			console.log("You lost!")
+			console.log( "You lost! Score: " + iScore );
 			respawnBricks = false;
 			hasLost = true;
 			oMenu.bricks = aBricks;
 			oMenu.animate();
 			window.cancelAnimationFrame( iAnimationRequestId );
 			oApplication.canvas.addEventListener( "click", fReset );
-			//window.alert( "Perdu !" );
-			// Refresh to restart
-			//window.location.reload( true );
 		};
 
 		var fGameWon = function() {
-			console.log("You won!");
+			hasWon = true;
+			console.log( "You won!" );
+			oMenu.init();
 			window.cancelAnimationFrame( iAnimationRequestId );
-			window.alert( "Gagné !" );
-			// Refresh to restart
-			window.location.reload( true );
+			oApplication.canvas.addEventListener( "click", fReset );
 		};
 
 		var fReset = function() {
 			oProjectile.x = oApplication.canvas.width / 2 - PROJECTILESIZE / 2;
 			oProjectile.y = oApplication.canvas.height - 45;
 			oProjectile.angle = -45;
+			oProjectile.speed = PROJECTILESPEED;
+			oPlatform.width = PLATFORMWIDTH;
 			iScore = 0;
 			hasLost = false;
 			aBricks = [];
