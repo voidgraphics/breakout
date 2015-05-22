@@ -197,16 +197,16 @@
 			"update": function( oEvent ){
 				if( oEvent.keyCode === 37 ){
 					// Left key
-					this.x -= this.speed;
+					oPlatform.x -= oPlatform.speed;
 				} else if( oEvent.keyCode === 39 ) {
 					// Right key
-					this.x += this.speed;
+					oPlatform.x += oPlatform.speed;
 				} else {
 					// Mouse control
-					this.x = oEvent.clientX - oSourceCanvasRect.left - this.width / 2;
+					oPlatform.x = oEvent.clientX - oSourceCanvasRect.left - oPlatform.width / 2;
 				}
-				( this.x < 0 ) && ( this.x = 0 );
-				( this.x > oSourceCanvasRect.width - this.width ) && ( this.x = oSourceCanvasRect.width - this.width );
+				( oPlatform.x < 0 ) && ( oPlatform.x = 0 );
+				( oPlatform.x > oSourceCanvasRect.width - oPlatform.width ) && ( oPlatform.x = oSourceCanvasRect.width - oPlatform.width );
 
 			},
 			"render": function(){
@@ -417,8 +417,8 @@
 			oApplication.context.clearRect( 0, 0, oApplication.width, oApplication.height );
 			console.log( "Starting game!" );
 			// listen to arrow keys to trigger platform movement
-			window.addEventListener( "keydown", oPlatform.update.bind( oPlatform ) );
-			window.addEventListener( "mousemove", oPlatform.update.bind( oPlatform ) );
+			window.addEventListener( "keydown", oPlatform.update );
+			window.addEventListener( "mousemove", oPlatform.update );
 			oApplication.canvas.removeEventListener( "click", start );
 			fAnimationLoop();
 		};
@@ -714,7 +714,7 @@
 			oProjectile.y = oApplication.canvas.height - 45;
 			oProjectile.angle = -45;
 			oProjectile.speed = PROJECTILESPEED;
-			oPlatform.width = PLATFORMWIDTH;
+			window.removeEventListener( "keydown", oPlatform.update );
 			iScore = 0;
 			hasLost = false;
 			aBricks = [];
