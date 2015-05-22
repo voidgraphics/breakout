@@ -116,7 +116,7 @@
 				sy: 0,
 				sw: BRICKWIDTH,
 				sh: BRICKHEIGHT
-			}
+			};
 			this.width 			= BRICKWIDTH;
 			this.height 		= BRICKHEIGHT;
 			this.x 				= iX;
@@ -149,9 +149,9 @@
 
 		Brick.prototype.render = function() {
 			aBricks.forEach( function( element ) {
-				if( element.hits == 1 ){
+				if( element.hits === 1 ){
 					element.frame.sy = 25;
-				} else if( element.hits == 2 ){	
+				} else if( element.hits === 2 ){	
 					element.frame.sy = 0;
 				}
 				oApplication.context.fillStyle = element.color;
@@ -180,7 +180,7 @@
 				brick.y += 5;
 			} );
 			this.render();
-		}
+		};
 
 
 		/**************************************************************
@@ -195,12 +195,12 @@
 			"x": oApplication.canvas.width / 2 - 50,
 			"y": oApplication.canvas.height - 30,
 			"update": function( oEvent ){
-				if( oEvent.keyCode == 37 ){
+				if( oEvent.keyCode === 37 ){
 					// Left key
-					this.x-=this.speed;
-				} else if( oEvent.keyCode == 39 ) {
+					this.x -= this.speed;
+				} else if( oEvent.keyCode === 39 ) {
 					// Right key
-					this.x+=this.speed;
+					this.x += this.speed;
 				} else {
 					// Mouse control
 					this.x = oEvent.clientX - oSourceCanvasRect.left - this.width / 2;
@@ -347,7 +347,7 @@
 					ctx.font = "16px 'Lato Black'";
 					ctx.textAlign = "center";
 					text = "YOU WON!".split("").join(String.fromCharCode(8194));
-					ctx.fillText( text, oApplication.width / 2, oApplication.height / 2 - 15 )
+					ctx.fillText( text, oApplication.width / 2, oApplication.height / 2 - 15 );
 					ctx.fillStyle = BEIGE;
 					ctx.font = "12PX Lato";
 					text = "CONGRATULATIONS. CLICK TO RESTART.".split("").join(String.fromCharCode(8194));
@@ -361,7 +361,7 @@
 					ctx.font = "16px 'Lato Black'";
 					ctx.textAlign = "center";
 					text = "GAMEOVER".split("").join(String.fromCharCode(8194));
-					ctx.fillText( text, oApplication.width / 2, oApplication.height / 2 - 15 )
+					ctx.fillText( text, oApplication.width / 2, oApplication.height / 2 - 15 );
 					ctx.fillStyle = BEIGE;
 					ctx.font = "12PX Lato";
 					text = ("YOU BROKE " + iScore + " BRICKS. CLICK TO PLAY AGAIN." ).split("").join(String.fromCharCode(8194));
@@ -375,7 +375,7 @@
 					ctx.font = "16px 'Lato Black'";
 					ctx.textAlign = "center";
 					text = "BREAKOUT".split("").join(String.fromCharCode(8194));
-					ctx.fillText( text, oApplication.width / 2, oApplication.height / 2 - 15 )
+					ctx.fillText( text, oApplication.width / 2, oApplication.height / 2 - 15 );
 					ctx.fillStyle = BEIGE;
 					text = "CLICK TO START".split("").join(String.fromCharCode(8194));
 					ctx.fillText(text, oApplication.width / 2, oApplication.height / 2 + 20);
@@ -397,7 +397,7 @@
 					}
 				} );
 			}
-		}
+		};
 
 		// prepare things before we start
 		var init = function() {
@@ -428,9 +428,9 @@
 				iPaddingY = 30, 
 				iXOffset = iPaddingX, 
 				iYOffset = iPaddingY, 
-				topBrickCount = 1, 
+				topBrickCount = 8, 
 				lineNumber = 1, 
-				maxLines = 1,
+				maxLines = 8,
 				speciality, 
 				k = 0;
 			console.log( "Generating bricks:" );
@@ -440,23 +440,23 @@
 				if( k <= 19 ){
 					speciality = "harder";
 				}
-				if( k == 15 ){
+				if( k === 15 ){
 					speciality = "faster";
 				}
-				if( k == 20 || k == 30 ){
+				if( k === 20 || k === 30 ){
 					speciality = "slower";
 				}
-				if( k == 1 ){
+				if( k === 1 ){
 					speciality = "shorter";
 				}
-				if( k == 24 ){
+				if( k === 24 ){
 					speciality = "shorter";
 				}
 
 				aBricks.push( new Brick( iXOffset, iYOffset, speciality ) );
 				console.log( "Created a brick!" );
 
-				if( i == topBrickCount ){
+				if( i === topBrickCount ){
 					iXOffset =  iPaddingX + lineNumber * ( ( aBricks[0].width / 2 ) + ( ( BRICKWIDTH + BRICKXMARGIN ) - aBricks[0].width ) / 2 );
 					iYOffset += ( BRICKHEIGHT + BRICKYMARGIN );
 					lineNumber++;
@@ -533,7 +533,7 @@
 
 				if( ( oProjectile.cx > x && oProjectile.cx < xx ) && ( oProjectile.cy > y && oProjectile.cy < yy ) ) {
 					// We have contact with the brick
-					if( oProjectile.angle == -45 ){
+					if( oProjectile.angle === -45 ){
 						/*
 							If the angle is -45 (top left direction), we can only touch the brick's bottom or right side
 							We calculate the ref point's distance from the bottom and right sides of the brick.
@@ -547,7 +547,7 @@
 							// alert('On entre par la droite');
 							fRebound('left');
 						}
-					} else if( oProjectile.angle == 45 ){
+					} else if( oProjectile.angle === 45 ){
 						distX = px - element.x;
 						distY = ( element.y + element.height ) - py;
 						if( distX >= distY ){
@@ -557,7 +557,7 @@
 							// alert('On entre par la gauche');
 							fRebound('right');
 						}
-					} else if( oProjectile.angle == 135 ){
+					} else if( oProjectile.angle === 135 ){
 						distX = px - element.x;
 						distY = py - element.y;
 						if( distX >= distY ){
@@ -567,7 +567,7 @@
 							// alert('On entre par la gauche');
 							fRebound('right');
 						}
-					} else if( oProjectile.angle == -135 ){
+					} else if( oProjectile.angle === -135 ){
 						distX = ( element.x + element.width ) - px;
 						distY = py - element.y;
 						if( distX >= distY ){
@@ -589,7 +589,7 @@
 		};
 
 		var fBrickReact = function( element ){
-			if( element.hits == element.maxHits ){
+			if( element.hits === element.maxHits ){
 				switch( element.speciality ){
 					case "shorter":
 						oPlatform.width = PLATFORMWIDTH / 2;
@@ -623,21 +623,21 @@
 
 		var fRebound = function( side ){
 
-			if( oProjectile.angle == -45 && side == "left" ){
+			if( oProjectile.angle === -45 && side === "left" ){
 				oProjectile.angle = 45;
-			} else if( oProjectile.angle == -135 && side == "left" ){
+			} else if( oProjectile.angle === -135 && side === "left" ){
 				oProjectile.angle = 135;
-			} else if( oProjectile.angle == 45 && side == "top" ){
+			} else if( oProjectile.angle === 45 && side === "top" ){
 				oProjectile.angle = 135;
-			} else if( oProjectile.angle == -45 && side == "top" ){
+			} else if( oProjectile.angle === -45 && side === "top" ){
 				oProjectile.angle = -135;
-			} else if( oProjectile.angle == 45 && side == "right" ){
+			} else if( oProjectile.angle === 45 && side === "right" ){
 				oProjectile.angle = -45;
-			} else if( oProjectile.angle == 135 && side == "right" ){
+			} else if( oProjectile.angle === 135 && side === "right" ){
 				oProjectile.angle = -135;
-			} else if( oProjectile.angle == -135 && side == "bottom" ){
+			} else if( oProjectile.angle === -135 && side === "bottom" ){
 				oProjectile.angle = -45;
-			} else if( oProjectile.angle == 135 && side == "bottom" ){
+			} else if( oProjectile.angle === 135 && side === "bottom" ){
 				oProjectile.angle = 45;
 			}
 
@@ -655,10 +655,10 @@
 
 				// Verify effects duration
 				iTime = ( new Date() ).getTime();
-				if( oProjectile.size != PROJECTILESIZE && iTime - iBiggerStartedTime > EFFECTDURATION ){
+				if( oProjectile.size !== PROJECTILESIZE && iTime - iBiggerStartedTime > EFFECTDURATION ){
 					oProjectile.size = PROJECTILESIZE;
 				}
-				if( oPlatform.width != PLATFORMWIDTH && iTime - iShorterStartedTime > EFFECTDURATION ){
+				if( oPlatform.width !== PLATFORMWIDTH && iTime - iShorterStartedTime > EFFECTDURATION ){
 					oPlatform.width = PLATFORMWIDTH;
 					oPlatform.x -= PLATFORMWIDTH / 4;
 				}
@@ -679,7 +679,7 @@
 					aBricks[ i ].update();
 				}
 
-				if( aBricks.length == 0 ){
+				if( aBricks.length === 0 ){
 					fGameWon();
 				}
 
