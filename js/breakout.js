@@ -709,6 +709,7 @@
 			oProjectile.y = oApplication.canvas.height - 45;
 			oProjectile.angle = -45;
 			oProjectile.speed = PROJECTILESPEED;
+			oPlatform.width = PLATFORMWIDTH;
 			window.removeEventListener( "keydown", oPlatform.update );
 			iScore = 0;
 			hasLost = false;
