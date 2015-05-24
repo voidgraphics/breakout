@@ -713,6 +713,7 @@
 			window.removeEventListener( "keydown", oPlatform.update );
 			iScore = 0;
 			hasLost = false;
+			hasWon = false;
 			aBricks = [];
 			fGenerateBricks();
 			start();
