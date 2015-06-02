@@ -194,7 +194,7 @@
 				} else if( oEvent.keyCode === 39 ) {
 					// Right key
 					oPlatform.x += oPlatform.speed;
-				} else {
+				} else if( oEvent.type === "mousemove" ){
 					// Mouse control
 					oPlatform.x = oEvent.clientX - oSourceCanvasRect.left - oPlatform.width / 2;
 				}
